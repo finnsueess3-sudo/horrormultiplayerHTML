@@ -1,200 +1,284 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HorrorWorld</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<title>HorrorWorld Multiplayer Test</title>
 
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #050505;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
+<style>
 
-    #game {
-      position: fixed;
-      inset: 0;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    #status {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 10;
-      padding: 10px 15px;
-      border-radius: 8px;
-      background: rgba(0,0,0,.7);
-      font-size: 14px;
-    }
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #87ceeb;
+}
 
-    #crosshair {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      width: 8px;
-      height: 8px;
-      transform: translate(-50%, -50%);
-      border: 2px solid white;
-      border-radius: 50%;
-      z-index: 5;
-      pointer-events: none;
-    }
+#game {
+  position: fixed;
+  inset: 0;
+}
 
-    #hud {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 10;
-      background: rgba(0,0,0,.65);
-      padding: 15px;
-      border-radius: 10px;
-      min-width: 220px;
-    }
+#status {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 20;
 
-    #role {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
+  padding: 10px 15px;
 
-    #players {
-      margin-top: 8px;
-      color: #bbb;
-    }
+  background: rgba(0,0,0,.7);
+  color: white;
 
-    #help {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 10;
-      padding: 12px;
-      background: rgba(0,0,0,.65);
-      border-radius: 10px;
-      color: #ccc;
-      font-size: 13px;
-      line-height: 1.6;
-    }
+  border-radius: 8px;
 
-    #start {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: radial-gradient(circle, #161616, #020202);
-    }
+  font-size: 14px;
+}
 
-    #startBox {
-      text-align: center;
-      padding: 35px;
-      border: 1px solid #333;
-      border-radius: 15px;
-      background: rgba(10,10,10,.95);
-      box-shadow: 0 0 50px rgba(255,0,0,.08);
-    }
+#hud {
+  position: fixed;
 
-    #startBox h1 {
-      font-size: 48px;
-      margin: 0 0 10px;
-      letter-spacing: 5px;
-    }
+  left: 20px;
+  bottom: 20px;
 
-    #startBox p {
-      color: #aaa;
-    }
+  z-index: 20;
 
-    button {
-      border: 0;
-      padding: 14px 28px;
-      border-radius: 8px;
-      background: #9b111e;
-      color: white;
-      font-size: 17px;
-      cursor: pointer;
-    }
+  background: rgba(0,0,0,.65);
 
-    button:hover {
-      background: #c01828;
-    }
-  </style>
+  color: white;
+
+  padding: 15px;
+
+  border-radius: 10px;
+
+  min-width: 220px;
+}
+
+#role {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#players {
+  margin-top: 8px;
+}
+
+#help {
+
+  position: fixed;
+
+  right: 20px;
+  bottom: 20px;
+
+  z-index: 20;
+
+  background: rgba(0,0,0,.65);
+
+  color: white;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  line-height: 1.6;
+
+  font-size: 13px;
+}
+
+#start {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 30;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: linear-gradient(
+    #87ceeb,
+    #dff6ff
+  );
+}
+
+#startBox {
+
+  text-align: center;
+
+  background: rgba(255,255,255,.95);
+
+  padding: 40px;
+
+  border-radius: 20px;
+
+  box-shadow: 0 15px 50px rgba(0,0,0,.25);
+}
+
+#startBox h1 {
+
+  margin: 0;
+
+  font-size: 45px;
+
+  color: #222;
+}
+
+#startBox p {
+
+  color: #555;
+}
+
+button {
+
+  border: 0;
+
+  padding: 14px 30px;
+
+  border-radius: 10px;
+
+  background: #2277dd;
+
+  color: white;
+
+  font-size: 17px;
+
+  cursor: pointer;
+}
+
+button:hover {
+
+  background: #1155aa;
+
+}
+
+</style>
 </head>
+
 
 <body>
 
+
 <div id="game"></div>
 
+
 <div id="status">
-  🔴 Firebase: Verbinde...
+🟡 Firebase: Verbinde...
 </div>
 
-<div id="crosshair"></div>
 
 <div id="hud">
-  <div id="role">Rolle: wird geladen...</div>
-  <div id="players">Spieler: 0</div>
+
+  <div id="role">
+    Rolle: wird geladen...
+  </div>
+
+  <div id="players">
+    Spieler: 0
+  </div>
+
 </div>
+
 
 <div id="help">
-  <b>Steuerung</b><br>
-  WASD – Bewegen<br>
-  SHIFT – Sprint<br>
-  SPACE – Springen<br>
-  F – Taschenlampe<br>
-  Maus – Umschauen
+
+<b>Steuerung</b><br>
+
+WASD – Bewegen<br>
+
+SHIFT – Sprint<br>
+
+SPACE – Springen<br>
+
+Maus – Umschauen
+
 </div>
 
+
 <div id="start">
+
   <div id="startBox">
-    <h1>HORRORWORLD</h1>
-    <p>3D MULTIPLAYER HORROR</p>
+
+    <h1>WORLD TEST</h1>
+
+    <p>Helle Multiplayer-Testkarte</p>
+
     <br>
-    <button id="startButton">SPIEL STARTEN</button>
+
+    <button id="startButton">
+      SPIEL STARTEN
+    </button>
+
   </div>
+
 </div>
+
 
 
 <script type="module">
 
+
 /* =========================================================
    FIREBASE
-   ========================================================= */
+========================================================= */
+
 
 import { initializeApp }
+
 from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 
-import {
-  getAuth,
-  signInAnonymously,
-  onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
 import {
-  getDatabase,
-  ref,
-  set,
-  update,
-  remove,
-  onValue,
-  onDisconnect,
-  runTransaction
+
+  getAuth,
+
+  signInAnonymously,
+
+  onAuthStateChanged
+
 }
+
+from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+import {
+
+  getDatabase,
+
+  ref,
+
+  set,
+
+  update,
+
+  remove,
+
+  onValue,
+
+  onDisconnect,
+
+  runTransaction
+
+}
+
 from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
 
 
 /* =========================================================
    FIREBASE CONFIG
-   ========================================================= */
+========================================================= */
+
 
 const firebaseConfig = {
 
@@ -219,31 +303,35 @@ const firebaseConfig = {
 };
 
 
-/* =========================================================
-   FIREBASE START
-   ========================================================= */
 
 const firebaseApp =
   initializeApp(firebaseConfig);
 
+
 const auth =
   getAuth(firebaseApp);
+
 
 const db =
   getDatabase(firebaseApp);
 
 
+
 /* =========================================================
-   THREE.JS
-   ========================================================= */
+   THREE
+========================================================= */
+
 
 import * as THREE
+
 from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+
 
 
 /* =========================================================
    VARIABLES
-   ========================================================= */
+========================================================= */
+
 
 let myId = null;
 
@@ -251,25 +339,13 @@ let myPlayerRef = null;
 
 let players = {};
 
-let otherPlayerMeshes = {};
+let otherPlayers = {};
 
 let isMonster = false;
 
 let gameStarted = false;
 
-let flashlightOn = true;
-
-const keys = {};
-
 let velocityY = 0;
-
-const speed = 5;
-
-const sprintSpeed = 8;
-
-const gravity = 18;
-
-const jumpPower = 8;
 
 let rotationY = 0;
 
@@ -278,62 +354,94 @@ let rotationX = 0;
 let lastNetworkUpdate = 0;
 
 
+const keys = {};
+
+
+const speed = 5;
+
+const sprintSpeed = 9;
+
+const gravity = 20;
+
+const jumpPower = 8;
+
+
+
 /* =========================================================
-   THREE SCENE
-   ========================================================= */
+   SCENE
+========================================================= */
+
 
 const scene =
   new THREE.Scene();
 
-scene.background =
-  new THREE.Color(0x030303);
 
-scene.fog =
-  new THREE.FogExp2(
-    0x050505,
-    0.035
+scene.background =
+  new THREE.Color(
+    0x87ceeb
   );
+
 
 
 /* =========================================================
    CAMERA
-   ========================================================= */
+========================================================= */
+
 
 const camera =
   new THREE.PerspectiveCamera(
+
     75,
-    innerWidth / innerHeight,
+
+    innerWidth /
+    innerHeight,
+
     0.1,
-    500
+
+    1000
+
   );
+
+
 
 camera.position.set(
   0,
-  1.7,
+  2,
   5
 );
 
 
+
 /* =========================================================
    RENDERER
-   ========================================================= */
+========================================================= */
+
 
 const renderer =
   new THREE.WebGLRenderer({
+
     antialias: true
+
   });
+
 
 renderer.setSize(
   innerWidth,
   innerHeight
 );
 
+
 renderer.setPixelRatio(
-  Math.min(devicePixelRatio, 2)
+  Math.min(
+    devicePixelRatio,
+    2
+  )
 );
+
 
 renderer.shadowMap.enabled =
   true;
+
 
 document
   .getElementById("game")
@@ -342,194 +450,340 @@ document
   );
 
 
+
 /* =========================================================
-   LIGHTING
-   ========================================================= */
+   LIGHT
+========================================================= */
+
 
 const ambient =
-  new THREE.HemisphereLight(
-    0x444444,
-    0x080808,
-    0.35
-  );
+  new THREE.AmbientLight(
 
-scene.add(ambient);
-
-
-const moon =
-  new THREE.DirectionalLight(
-    0x778899,
-    0.5
-  );
-
-moon.position.set(
-  30,
-  50,
-  20
-);
-
-moon.castShadow =
-  true;
-
-scene.add(moon);
-
-
-/* =========================================================
-   FLASHLIGHT
-   ========================================================= */
-
-const flashlight =
-  new THREE.SpotLight(
     0xffffff,
-    5,
-    35,
-    Math.PI / 7,
-    0.5,
-    1
+
+    1.2
+
   );
 
-flashlight.position.set(
-  0,
-  1.65,
-  0
-);
-
-flashlight.target.position.set(
-  0,
-  1.5,
-  -10
-);
-
-scene.add(flashlight);
 
 scene.add(
-  flashlight.target
+  ambient
 );
+
+
+
+const sun =
+  new THREE.DirectionalLight(
+
+    0xffffff,
+
+    2
+
+  );
+
+
+sun.position.set(
+  50,
+  100,
+  50
+);
+
+
+sun.castShadow =
+  true;
+
+
+scene.add(
+  sun
+);
+
 
 
 /* =========================================================
    GROUND
-   ========================================================= */
-
-const groundMaterial =
-  new THREE.MeshStandardMaterial({
-    color: 0x151515,
-    roughness: 1
-  });
+========================================================= */
 
 
 const ground =
   new THREE.Mesh(
+
     new THREE.PlaneGeometry(
-      300,
-      300
+      500,
+      500
     ),
-    groundMaterial
+
+    new THREE.MeshStandardMaterial({
+
+      color:
+        0x55aa55,
+
+      roughness:
+        1
+
+    })
+
   );
+
 
 ground.rotation.x =
   -Math.PI / 2;
 
+
 ground.receiveShadow =
   true;
 
-scene.add(ground);
+
+scene.add(
+  ground
+);
+
 
 
 /* =========================================================
    ROAD
-   ========================================================= */
-
-const roadMaterial =
-  new THREE.MeshStandardMaterial({
-    color: 0x202020
-  });
+========================================================= */
 
 
 const road =
   new THREE.Mesh(
+
     new THREE.PlaneGeometry(
-      25,
-      300
+      30,
+      500
     ),
-    roadMaterial
+
+    new THREE.MeshStandardMaterial({
+
+      color:
+        0x777777
+
+    })
+
   );
+
 
 road.rotation.x =
   -Math.PI / 2;
 
+
 road.position.y =
   0.01;
 
-scene.add(road);
+
+scene.add(
+  road
+);
+
+
+
+/* =========================================================
+   ROAD LINES
+========================================================= */
+
+
+for (
+  let z = -240;
+  z < 250;
+  z += 12
+) {
+
+  const line =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        1,
+        0.05,
+        6
+      ),
+
+      new THREE.MeshStandardMaterial({
+
+        color:
+          0xffffff
+
+      })
+
+    );
+
+
+  line.position.set(
+    0,
+    0.04,
+    z
+  );
+
+
+  scene.add(
+    line
+  );
+
+}
+
 
 
 /* =========================================================
    HOUSE
-   ========================================================= */
+========================================================= */
 
-function createHouse(x, z) {
+
+function createHouse(
+  x,
+  z
+) {
+
 
   const group =
     new THREE.Group();
 
 
-  const wallMaterial =
-    new THREE.MeshStandardMaterial({
-      color: 0x242424
-    });
-
-
-  const roofMaterial =
-    new THREE.MeshStandardMaterial({
-      color: 0x101010
-    });
-
-
-  const walls =
+  const wall =
     new THREE.Mesh(
+
       new THREE.BoxGeometry(
         12,
         6,
         10
       ),
-      wallMaterial
+
+      new THREE.MeshStandardMaterial({
+
+        color:
+          0xf0d0a0
+
+      })
+
     );
 
 
-  walls.position.y =
+  wall.position.y =
     3;
 
-  walls.castShadow =
+
+  wall.castShadow =
     true;
 
-  walls.receiveShadow =
+
+  wall.receiveShadow =
     true;
 
-  group.add(walls);
+
+  group.add(
+    wall
+  );
+
 
 
   const roof =
     new THREE.Mesh(
+
       new THREE.ConeGeometry(
-        8,
+        9,
         4,
         4
       ),
-      roofMaterial
+
+      new THREE.MeshStandardMaterial({
+
+        color:
+          0xaa3333
+
+      })
+
     );
+
+
+  roof.position.y =
+    8;
 
 
   roof.rotation.y =
     Math.PI / 4;
 
-  roof.position.y =
-    8;
 
   roof.castShadow =
     true;
 
-  group.add(roof);
+
+  group.add(
+    roof
+  );
+
+
+
+  /* Tür */
+
+
+  const door =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        2,
+        3,
+        .2
+      ),
+
+      new THREE.MeshStandardMaterial({
+
+        color:
+          0x553322
+
+      })
+
+    );
+
+
+  door.position.set(
+    0,
+    1.5,
+    -5.1
+  );
+
+
+  group.add(
+    door
+  );
+
+
+
+  /* Fenster */
+
+
+  for (
+    const x2 of [-3,3]
+  ) {
+
+    const window =
+      new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+          2,
+          2,
+          .2
+        ),
+
+        new THREE.MeshStandardMaterial({
+
+          color:
+            0x66ccff
+
+        })
+
+      );
+
+
+    window.position.set(
+      x2,
+      3,
+      -5.1
+    );
+
+
+    group.add(
+      window
+    );
+
+  }
+
 
 
   group.position.set(
@@ -538,38 +792,82 @@ function createHouse(x, z) {
     z
   );
 
-  scene.add(group);
+
+  scene.add(
+    group
+  );
+
 }
 
 
-/* =========================================================
-   HOUSES
-   ========================================================= */
 
-createHouse(-35, -25);
-createHouse(35, -40);
-createHouse(-40, 30);
-createHouse(40, 25);
-createHouse(-55, -65);
-createHouse(55, -80);
+/* Häuser */
+
+
+createHouse(
+  -35,
+  -25
+);
+
+
+createHouse(
+  35,
+  -50
+);
+
+
+createHouse(
+  -45,
+  35
+);
+
+
+createHouse(
+  45,
+  60
+);
+
+
+createHouse(
+  -40,
+  90
+);
+
+
+createHouse(
+  40,
+  120
+);
+
 
 
 /* =========================================================
    TREES
-   ========================================================= */
+========================================================= */
 
-function createTree(x, z) {
+
+function createTree(
+  x,
+  z
+) {
+
 
   const trunk =
     new THREE.Mesh(
+
       new THREE.CylinderGeometry(
-        .35,
-        .5,
+        .4,
+        .55,
         4
       ),
+
       new THREE.MeshStandardMaterial({
-        color: 0x24160e
+
+        color:
+          0x704020
+
       })
+
     );
 
 
@@ -579,22 +877,33 @@ function createTree(x, z) {
     z
   );
 
+
   trunk.castShadow =
     true;
 
-  scene.add(trunk);
+
+  scene.add(
+    trunk
+  );
+
 
 
   const leaves =
     new THREE.Mesh(
+
       new THREE.SphereGeometry(
-        2.5,
-        8,
-        8
+        2.7,
+        10,
+        10
       ),
+
       new THREE.MeshStandardMaterial({
-        color: 0x101d12
+
+        color:
+          0x228833
+
       })
+
     );
 
 
@@ -604,127 +913,104 @@ function createTree(x, z) {
     z
   );
 
+
   leaves.castShadow =
     true;
 
-  scene.add(leaves);
+
+  scene.add(
+    leaves
+  );
+
 }
+
 
 
 for (
   let i = 0;
-  i < 70;
+  i < 100;
   i++
 ) {
 
+
   const x =
-    (Math.random() - .5) * 260;
+    (Math.random() - .5)
+    * 300;
+
 
   const z =
-    (Math.random() - .5) * 260;
+    (Math.random() - .5)
+    * 300;
+
 
 
   if (
     Math.abs(x) < 20
-  ) {
+  )
     continue;
-  }
 
 
   createTree(
     x,
     z
   );
-}
-
-
-/* =========================================================
-   CEMETERY
-   ========================================================= */
-
-function createGrave(x, z) {
-
-  const grave =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        1.2,
-        1.5,
-        .4
-      ),
-      new THREE.MeshStandardMaterial({
-        color: 0x333333
-      })
-    );
-
-
-  grave.position.set(
-    x,
-    .75,
-    z
-  );
-
-
-  grave.rotation.y =
-    (Math.random() - .5) * .4;
-
-
-  grave.castShadow =
-    true;
-
-  scene.add(grave);
-}
-
-
-for (
-  let i = 0;
-  i < 25;
-  i++
-) {
-
-  createGrave(
-    75 + (i % 5) * 3,
-    40 + Math.floor(i / 5) * 4
-  );
 
 }
+
 
 
 /* =========================================================
    PLAYER
-   ========================================================= */
+========================================================= */
+
 
 const player =
   new THREE.Group();
 
 
-const body =
+const playerBody =
   new THREE.Mesh(
+
     new THREE.CapsuleGeometry(
       .35,
-      1.0,
+      1,
       4,
       8
     ),
+
     new THREE.MeshStandardMaterial({
-      color: 0xdddddd
+
+      color:
+        0xeeeeee
+
     })
+
   );
 
 
-body.position.y =
+playerBody.position.y =
   1;
 
-body.castShadow =
+
+playerBody.castShadow =
   true;
 
-player.add(body);
 
-scene.add(player);
+player.add(
+  playerBody
+);
+
+
+scene.add(
+  player
+);
+
 
 
 /* =========================================================
    KEYBOARD
-   ========================================================= */
+========================================================= */
+
 
 document.addEventListener(
   "keydown",
@@ -732,19 +1018,6 @@ document.addEventListener(
 
     keys[e.code] =
       true;
-
-
-    if (
-      e.code === "KeyF"
-    ) {
-
-      flashlightOn =
-        !flashlightOn;
-
-      flashlight.visible =
-        flashlightOn;
-
-    }
 
   }
 );
@@ -761,15 +1034,19 @@ document.addEventListener(
 );
 
 
+
 /* =========================================================
    MOUSE
-   ========================================================= */
+========================================================= */
+
 
 document.addEventListener(
   "mousemove",
   e => {
 
-    if (!gameStarted)
+    if (
+      !gameStarted
+    )
       return;
 
 
@@ -781,11 +1058,13 @@ document.addEventListener(
 
 
     rotationY -=
-      e.movementX * 0.002;
+      e.movementX *
+      0.002;
 
 
     rotationX -=
-      e.movementY * 0.002;
+      e.movementY *
+      0.002;
 
 
     rotationX =
@@ -801,31 +1080,11 @@ document.addEventListener(
 );
 
 
-/* =========================================================
-   POINTER LOCK
-   ========================================================= */
-
-renderer.domElement.addEventListener(
-  "click",
-  () => {
-
-    if (
-      gameStarted &&
-      document.pointerLockElement !==
-      renderer.domElement
-    ) {
-
-      renderer.domElement.requestPointerLock();
-
-    }
-
-  }
-);
-
 
 /* =========================================================
    JUMP
-   ========================================================= */
+========================================================= */
+
 
 document.addEventListener(
   "keydown",
@@ -833,7 +1092,9 @@ document.addEventListener(
 
     if (
       e.code === "Space" &&
-      Math.abs(velocityY) < 0.1 &&
+      Math.abs(
+        velocityY
+      ) < .1 &&
       gameStarted
     ) {
 
@@ -846,297 +1107,76 @@ document.addEventListener(
 );
 
 
-/* =========================================================
-   CREATE OTHER PLAYER
-   ========================================================= */
-
-function createOtherPlayer(
-  id,
-  data
-) {
-
-  const group =
-    new THREE.Group();
-
-
-  let playerColor =
-    0x4488ff;
-
-
-  if (
-    data.role === "monster"
-  ) {
-
-    playerColor =
-      0xff1111;
-
-  }
-
-
-  const material =
-    new THREE.MeshStandardMaterial({
-      color: playerColor
-    });
-
-
-  const mesh =
-    new THREE.Mesh(
-      new THREE.CapsuleGeometry(
-        .35,
-        1.0,
-        4,
-        8
-      ),
-      material
-    );
-
-
-  mesh.position.y =
-    1;
-
-  mesh.castShadow =
-    true;
-
-  group.add(mesh);
-
-  scene.add(group);
-
-  otherPlayerMeshes[id] =
-    group;
-
-}
-
-
-/* =========================================================
-   REMOVE OTHER PLAYER
-   ========================================================= */
-
-function removeOtherPlayer(id) {
-
-  const mesh =
-    otherPlayerMeshes[id];
-
-
-  if (!mesh)
-    return;
-
-
-  scene.remove(mesh);
-
-  mesh.traverse(
-    object => {
-
-      if (
-        object.geometry
-      ) {
-
-        object.geometry.dispose();
-
-      }
-
-
-      if (
-        object.material
-      ) {
-
-        object.material.dispose();
-
-      }
-
-    }
-  );
-
-
-  delete otherPlayerMeshes[id];
-
-}
-
-
-/* =========================================================
-   UPDATE OTHER PLAYERS
-   ========================================================= */
-
-function updatePlayers() {
-
-  const ids =
-    Object.keys(players);
-
-
-  document.getElementById(
-    "players"
-  ).textContent =
-    "Spieler: " + ids.length;
-
-
-  /* Neue Spieler */
-
-  for (
-    const id of ids
-  ) {
-
-    if (
-      id === myId
-    )
-      continue;
-
-
-    const data =
-      players[id];
-
-
-    if (
-      !data
-    )
-      continue;
-
-
-    if (
-      !otherPlayerMeshes[id]
-    ) {
-
-      createOtherPlayer(
-        id,
-        data
-      );
-
-    }
-
-
-    const mesh =
-      otherPlayerMeshes[id];
-
-
-    if (!mesh)
-      continue;
-
-
-    mesh.position.set(
-      Number(data.x) || 0,
-      Number(data.y) || 0,
-      Number(data.z) || 0
-    );
-
-
-    mesh.rotation.y =
-      Number(data.rotation) || 0;
-
-
-    /* Rolle aktualisieren */
-
-    const body =
-      mesh.children[0];
-
-
-    if (
-      body &&
-      body.material
-    ) {
-
-      if (
-        data.role === "monster"
-      ) {
-
-        body.material.color.set(
-          0xff1111
-        );
-
-      } else {
-
-        body.material.color.set(
-          0x4488ff
-        );
-
-      }
-
-    }
-
-  }
-
-
-  /* Spieler entfernen,
-     die nicht mehr in Firebase sind */
-
-  for (
-    const id in otherPlayerMeshes
-  ) {
-
-    if (
-      !players[id]
-    ) {
-
-      removeOtherPlayer(id);
-
-    }
-
-  }
-
-}
-
 
 /* =========================================================
    FIREBASE LOGIN
-   ========================================================= */
-
-signInAnonymously(auth)
-  .catch(
-    error => {
-
-      console.error(
-        "Firebase Login Fehler:",
-        error
-      );
+========================================================= */
 
 
-      document.getElementById(
-        "status"
-      ).textContent =
-        "❌ Firebase Login Fehler";
+signInAnonymously(
+  auth
+)
+.catch(
+  error => {
 
-    }
-  );
+    console.error(
+      error
+    );
+
+
+    document.getElementById(
+      "status"
+    ).textContent =
+      "❌ Firebase Login Fehler";
+
+  }
+);
+
 
 
 /* =========================================================
-   AUTH STATE
-   ========================================================= */
+   AUTH
+========================================================= */
+
 
 onAuthStateChanged(
   auth,
   async user => {
 
+
     if (!user)
       return;
+
 
 
     myId =
       user.uid;
 
 
+
     console.log(
-      "Meine Firebase ID:",
+      "MEINE ID:",
       myId
     );
 
 
-    /* Spieler-Referenz */
 
     myPlayerRef =
       ref(
+
         db,
-        "games/main/players/" +
-        myId
+
+        "games/main/players/"
+        + myId
+
       );
 
-
-    document.getElementById(
-      "status"
-    ).textContent =
-      "🟢 Firebase verbunden";
 
 
     /* =====================================================
        MONSTER AUSWÄHLEN
-       ===================================================== */
+    ===================================================== */
+
 
     const monsterRef =
       ref(
@@ -1147,7 +1187,9 @@ onAuthStateChanged(
 
     const result =
       await runTransaction(
+
         monsterRef,
+
         current => {
 
           if (
@@ -1162,54 +1204,71 @@ onAuthStateChanged(
           return current;
 
         }
+
       );
 
 
-    const monsterId =
-      result.snapshot.val();
-
-
     isMonster =
-      monsterId === myId;
+      result.snapshot.val()
+      === myId;
 
 
-    updateRoleUI();
+
+    updateRole();
+
 
 
     /* =====================================================
-       SPIELER REGISTRIEREN
-       ===================================================== */
+       SPIELER SPEICHERN
+    ===================================================== */
+
 
     await set(
+
       myPlayerRef,
+
       {
+
         x: 0,
+
         y: 0,
+
         z: 5,
+
         rotation: 0,
+
         role:
           isMonster
-            ? "monster"
-            : "player",
-        online: true,
+          ? "monster"
+          : "player",
+
+        online:
+          true,
+
         joinedAt:
           Date.now()
+
       }
+
     );
 
 
+
     /* =====================================================
-       DISCONNECT
-       ===================================================== */
+       BEI DISCONNECT LÖSCHEN
+    ===================================================== */
+
 
     onDisconnect(
       myPlayerRef
     ).remove();
 
 
+
     /* =====================================================
-       ALLE SPIELER BEOBACHTEN
-       ===================================================== */
+       SPIELER BEOBACHTEN
+    ===================================================== */
+
 
     const playersRef =
       ref(
@@ -1219,27 +1278,35 @@ onAuthStateChanged(
 
 
     onValue(
+
       playersRef,
+
       snapshot => {
 
         players =
-          snapshot.val() || {};
+          snapshot.val()
+          || {};
 
 
         updatePlayers();
 
       }
+
     );
+
 
   }
 );
 
 
-/* =========================================================
-   ROLE UI
-   ========================================================= */
 
-function updateRoleUI() {
+/* =========================================================
+   ROLE
+========================================================= */
+
+
+function updateRole() {
+
 
   const role =
     document.getElementById(
@@ -1247,34 +1314,248 @@ function updateRoleUI() {
     );
 
 
-  if (isMonster) {
+  if (
+    isMonster
+  ) {
 
     role.textContent =
-      "👹 Rolle: MONSTER";
+      "👹 MONSTER";
 
     role.style.color =
-      "#ff3333";
+      "#ff2222";
 
-  } else {
+  }
+
+  else {
 
     role.textContent =
-      "🏃 Rolle: GEJAGTER";
+      "🔵 GEJAGTER";
 
     role.style.color =
-      "#4488ff";
+      "#55aaff";
 
   }
 
 }
 
 
+
+/* =========================================================
+   CREATE OTHER PLAYER
+========================================================= */
+
+
+function createOtherPlayer(
+  id,
+  data
+) {
+
+
+  const material =
+    new THREE.MeshStandardMaterial({
+
+      color:
+        data.role === "monster"
+        ? 0xff2222
+        : 0x2266ff
+
+    });
+
+
+
+  const mesh =
+    new THREE.Mesh(
+
+      new THREE.CapsuleGeometry(
+        .35,
+        1,
+        4,
+        8
+      ),
+
+      material
+
+    );
+
+
+  mesh.position.y =
+    1;
+
+
+  mesh.castShadow =
+    true;
+
+
+  scene.add(
+    mesh
+  );
+
+
+  otherPlayers[id] =
+    mesh;
+
+}
+
+
+
+/* =========================================================
+   UPDATE PLAYERS
+========================================================= */
+
+
+function updatePlayers() {
+
+
+  const ids =
+    Object.keys(
+      players
+    );
+
+
+
+  document.getElementById(
+    "players"
+  ).textContent =
+    "Spieler: "
+    + ids.length;
+
+
+
+  /* Neue Spieler */
+
+
+  for (
+    const id of ids
+  ) {
+
+
+    if (
+      id === myId
+    )
+      continue;
+
+
+
+    const data =
+      players[id];
+
+
+
+    if (!data)
+      continue;
+
+
+
+    if (
+      !otherPlayers[id]
+    ) {
+
+      createOtherPlayer(
+        id,
+        data
+      );
+
+    }
+
+
+
+    const mesh =
+      otherPlayers[id];
+
+
+
+    mesh.position.set(
+
+      Number(data.x)
+      || 0,
+
+      Number(data.y)
+      || 0,
+
+      Number(data.z)
+      || 0
+
+    );
+
+
+
+    mesh.rotation.y =
+      Number(
+        data.rotation
+      )
+      || 0;
+
+
+
+    /* Farbe */
+
+
+    if (
+      mesh.material
+    ) {
+
+      mesh.material.color.set(
+
+        data.role === "monster"
+
+        ? 0xff2222
+
+        : 0x2266ff
+
+      );
+
+    }
+
+  }
+
+
+
+  /* Spieler löschen */
+
+
+  for (
+    const id in otherPlayers
+  ) {
+
+
+    if (
+      !players[id]
+    ) {
+
+      scene.remove(
+        otherPlayers[id]
+      );
+
+
+      otherPlayers[id]
+        .geometry
+        .dispose();
+
+
+      otherPlayers[id]
+        .material
+        .dispose();
+
+
+      delete otherPlayers[id];
+
+    }
+
+  }
+
+}
+
+
+
 /* =========================================================
    SEND POSITION
-   ========================================================= */
+========================================================= */
+
 
 function sendPosition(
   time
 ) {
+
 
   if (
     !myPlayerRef
@@ -1282,19 +1563,27 @@ function sendPosition(
     return;
 
 
+
   if (
-    time - lastNetworkUpdate < 50
+    time -
+    lastNetworkUpdate
+    < 50
   )
     return;
+
 
 
   lastNetworkUpdate =
     time;
 
 
+
   update(
+
     myPlayerRef,
+
     {
+
       x:
         player.position.x,
 
@@ -1309,13 +1598,15 @@ function sendPosition(
 
       online:
         true
+
     }
+
   )
   .catch(
     error => {
 
       console.error(
-        "Position konnte nicht gesendet werden:",
+        "Position Fehler:",
         error
       );
 
@@ -1325,16 +1616,20 @@ function sendPosition(
 }
 
 
+
 /* =========================================================
-   START GAME
-   ========================================================= */
+   START
+========================================================= */
+
 
 document
   .getElementById(
     "startButton"
   )
   .addEventListener(
+
     "click",
+
     () => {
 
       gameStarted =
@@ -1347,127 +1642,153 @@ document
         "none";
 
 
-      renderer.domElement.requestPointerLock();
+      renderer.domElement
+        .requestPointerLock();
 
     }
+
   );
+
 
 
 /* =========================================================
    GAME LOOP
-   ========================================================= */
+========================================================= */
+
 
 let previousTime =
   performance.now();
+
 
 
 function animate(
   time
 ) {
 
+
   requestAnimationFrame(
     animate
   );
 
 
+
   const dt =
     Math.min(
-      (time - previousTime) / 1000,
-      0.05
+
+      (
+        time -
+        previousTime
+      ) / 1000,
+
+      .05
+
     );
+
 
 
   previousTime =
     time;
 
 
+
   if (
     gameStarted
   ) {
 
-    /* =====================================================
-       SPEED
-       ===================================================== */
 
     let moveSpeed =
       keys["ShiftLeft"] ||
       keys["ShiftRight"]
-        ? sprintSpeed
-        : speed;
+
+      ? sprintSpeed
+
+      : speed;
 
 
-    /* =====================================================
-       MOVEMENT
-       ===================================================== */
 
-    let forward =
-      0;
+    let forward = 0;
 
-    let sideways =
-      0;
+    let sideways = 0;
+
 
 
     if (
       keys["KeyW"]
     )
-      forward += 1;
+      forward++;
 
 
     if (
       keys["KeyS"]
     )
-      forward -= 1;
+      forward--;
 
 
     if (
       keys["KeyA"]
     )
-      sideways -= 1;
+      sideways--;
 
 
     if (
       keys["KeyD"]
     )
-      sideways += 1;
+      sideways++;
+
 
 
     const direction =
       new THREE.Vector3(
+
         sideways,
+
         0,
+
         -forward
+
       );
+
 
 
     if (
       direction.length() > 0
     ) {
 
+
       direction.normalize();
 
 
+
       direction.applyAxisAngle(
+
         new THREE.Vector3(
           0,
           1,
           0
         ),
+
         rotationY
+
       );
 
 
+
       player.position.add(
+
         direction.multiplyScalar(
+
           moveSpeed * dt
+
         )
+
       );
 
     }
 
 
-    /* =====================================================
-       GRAVITY
-       ===================================================== */
+
+    /* Gravity */
+
 
     velocityY -=
       gravity * dt;
@@ -1475,6 +1796,7 @@ function animate(
 
     player.position.y +=
       velocityY * dt;
+
 
 
     if (
@@ -1490,9 +1812,9 @@ function animate(
     }
 
 
-    /* =====================================================
-       CAMERA
-       ===================================================== */
+
+    /* Kamera */
+
 
     camera.position.copy(
       player.position
@@ -1501,6 +1823,7 @@ function animate(
 
     camera.position.y +=
       1.7;
+
 
 
     camera.rotation.order =
@@ -1515,42 +1838,13 @@ function animate(
       rotationX;
 
 
-    /* =====================================================
-       FLASHLIGHT
-       ===================================================== */
 
-    flashlight.position.copy(
-      camera.position
+    sendPosition(
+      time
     );
-
-
-    const target =
-      new THREE.Vector3(
-        0,
-        0,
-        -10
-      );
-
-
-    target.applyQuaternion(
-      camera.quaternion
-    );
-
-
-    flashlight.target.position.copy(
-      camera.position
-    ).add(
-      target
-    );
-
-
-    /* =====================================================
-       NETWORK
-       ===================================================== */
-
-    sendPosition(time);
 
   }
+
 
 
   renderer.render(
@@ -1561,14 +1855,17 @@ function animate(
 }
 
 
+
 animate(
   performance.now()
 );
 
 
+
 /* =========================================================
    RESIZE
-   ========================================================= */
+========================================================= */
+
 
 window.addEventListener(
   "resize",
@@ -1583,12 +1880,16 @@ window.addEventListener(
 
 
     renderer.setSize(
+
       innerWidth,
+
       innerHeight
+
     );
 
   }
 );
+
 
 </script>
 
