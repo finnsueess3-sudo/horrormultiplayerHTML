@@ -1,2330 +1,1317 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>HORROR WORLD</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HorrorWorld</title>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#000;
-    font-family:Arial,sans-serif;
-}
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #050505;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
 
-canvas{
-    display:block;
-}
+    #game {
+      position: fixed;
+      inset: 0;
+    }
 
-#menu{
-    position:fixed;
-    inset:0;
-    z-index:100;
-    background:
-        radial-gradient(circle,#172019 0%,#050806 45%,#000 100%);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    text-align:center;
-}
+    #status {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 10;
+      padding: 10px 15px;
+      border-radius: 8px;
+      background: rgba(0,0,0,.7);
+      font-size: 14px;
+    }
 
-#menu h1{
-    font-size:55px;
-    letter-spacing:12px;
-    margin:0;
-    text-shadow:
-        0 0 15px #fff,
-        0 0 50px #263;
-}
+    #crosshair {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      transform: translate(-50%, -50%);
+      border: 2px solid white;
+      border-radius: 50%;
+      z-index: 5;
+      pointer-events: none;
+    }
 
-#menu p{
-    opacity:.65;
-    margin:25px;
-}
+    #hud {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10;
+      background: rgba(0,0,0,.65);
+      padding: 15px;
+      border-radius: 10px;
+      min-width: 220px;
+    }
 
-#startButton{
-    padding:15px 35px;
-    border:1px solid #777;
-    background:#101510;
-    color:white;
-    cursor:pointer;
-    font-size:18px;
-    border-radius:5px;
-}
+    #role {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
 
-#startButton:hover{
-    background:#222;
-}
+    #players {
+      margin-top: 8px;
+      color: #bbb;
+    }
 
-#crosshair{
-    position:fixed;
-    left:50%;
-    top:50%;
-    width:5px;
-    height:5px;
-    transform:translate(-50%,-50%);
-    border-radius:50%;
-    background:white;
-    z-index:20;
-    box-shadow:0 0 8px black;
-    pointer-events:none;
-}
+    #help {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 10;
+      padding: 12px;
+      background: rgba(0,0,0,.65);
+      border-radius: 10px;
+      color: #ccc;
+      font-size: 13px;
+      line-height: 1.6;
+    }
 
-#hud{
-    position:fixed;
-    left:15px;
-    top:15px;
-    z-index:20;
-    color:white;
-    background:rgba(0,0,0,.65);
-    padding:12px 15px;
-    border-radius:8px;
-    line-height:1.6;
-    font-size:14px;
-}
+    #start {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle, #161616, #020202);
+    }
 
-#role{
-    position:fixed;
-    top:15px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:20;
-    color:white;
-    padding:10px 20px;
-    background:rgba(0,0,0,.75);
-    border-radius:20px;
-    font-weight:bold;
-}
+    #startBox {
+      text-align: center;
+      padding: 35px;
+      border: 1px solid #333;
+      border-radius: 15px;
+      background: rgba(10,10,10,.95);
+      box-shadow: 0 0 50px rgba(255,0,0,.08);
+    }
 
-#status{
-    position:fixed;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    color:white;
-    background:rgba(0,0,0,.7);
-    padding:10px 20px;
-    border-radius:20px;
-    z-index:20;
-}
+    #startBox h1 {
+      font-size: 48px;
+      margin: 0 0 10px;
+      letter-spacing: 5px;
+    }
 
-#flashlight{
-    position:fixed;
-    right:15px;
-    bottom:15px;
-    z-index:20;
-    color:white;
-    background:rgba(0,0,0,.65);
-    padding:10px;
-    border-radius:7px;
-}
+    #startBox p {
+      color: #aaa;
+    }
 
-#flash{
-    position:fixed;
-    inset:0;
-    z-index:90;
-    pointer-events:none;
-    background:white;
-    opacity:0;
-}
+    button {
+      border: 0;
+      padding: 14px 28px;
+      border-radius: 8px;
+      background: #9b111e;
+      color: white;
+      font-size: 17px;
+      cursor: pointer;
+    }
 
-#jumpscare{
-    position:fixed;
-    inset:0;
-    z-index:95;
-    pointer-events:none;
-    opacity:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:
-        radial-gradient(circle,
-        rgba(120,0,0,.8),
-        rgba(0,0,0,.95));
-}
-
-#jumpscareFace{
-    font-size:180px;
-    filter:
-        drop-shadow(0 0 20px red)
-        drop-shadow(0 0 50px black);
-}
-
-#dead{
-    position:fixed;
-    inset:0;
-    z-index:200;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    background:rgba(0,0,0,.96);
-    color:#fff;
-}
-
-#dead h1{
-    font-size:70px;
-    letter-spacing:10px;
-    margin:0;
-}
-
-#dead p{
-    opacity:.6;
-}
-
-#vignette{
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    z-index:15;
-    background:
-        radial-gradient(
-            ellipse at center,
-            transparent 35%,
-            rgba(0,0,0,.25) 65%,
-            rgba(0,0,0,.9)
-        );
-}
-
-#danger{
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    z-index:14;
-    opacity:0;
-    background:
-        radial-gradient(
-            circle,
-            transparent 30%,
-            rgba(130,0,0,.4)
-        );
-}
-</style>
+    button:hover {
+      background: #c01828;
+    }
+  </style>
 </head>
 
 <body>
 
-<div id="menu">
-    <div>
-        <h1>HORROR WORLD</h1>
-        <p>Ein Monster. Mehrere Gejagte.</p>
-        <p id="connection">Multiplayer wird verbunden...</p>
-        <button id="startButton">SPIEL STARTEN</button>
-    </div>
+<div id="game"></div>
+
+<div id="status">
+  🔴 Firebase: Verbinde...
 </div>
 
 <div id="crosshair"></div>
 
 <div id="hud">
-    <b>STEUERUNG</b><br>
-    WASD → Bewegen<br>
-    SHIFT → Sprint<br>
-    SPACE → Springen<br>
-    F → Taschenlampe<br>
-    Q → Fähigkeit<br>
-    Maus → Umschauen
+  <div id="role">Rolle: wird geladen...</div>
+  <div id="players">Spieler: 0</div>
 </div>
 
-<div id="role">Verbinde...</div>
-
-<div id="status">Suche Spieler...</div>
-
-<div id="flashlight">
-    🔦 Taschenlampe: AN
+<div id="help">
+  <b>Steuerung</b><br>
+  WASD – Bewegen<br>
+  SHIFT – Sprint<br>
+  SPACE – Springen<br>
+  F – Taschenlampe<br>
+  Maus – Umschauen
 </div>
 
-<div id="danger"></div>
-
-<div id="flash"></div>
-
-<div id="jumpscare">
-    <div id="jumpscareFace">👹</div>
+<div id="start">
+  <div id="startBox">
+    <h1>HORRORWORLD</h1>
+    <p>3D MULTIPLAYER HORROR</p>
+    <br>
+    <button id="startButton">SPIEL STARTEN</button>
+  </div>
 </div>
-
-<div id="vignette"></div>
-
-<div id="dead">
-    <h1>DU BIST VERLOREN</h1>
-    <p>Das Monster hat dich erwischt.</p>
-</div>
-
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
 <script type="module">
 
-import * as THREE from
-"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+/* =========================================================
+   FIREBASE
+   ========================================================= */
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
+import {
+  getAuth,
+  signInAnonymously,
+  onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+import {
+  getDatabase,
+  ref,
+  set,
+  update,
+  remove,
+  onValue,
+  onDisconnect,
+  runTransaction
+}
+from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
 
-// ======================================================
-// MULTIPLAYER
-// ======================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBiQVy6ItxzIhFqPI6ErUXsVw59IYu3Fos",
+  authDomain: "horrorworld-1e247.firebaseapp.com",
+  projectId: "horrorworld-1e247",
+  storageBucket: "horrorworld-1e247.firebasestorage.app",
+  messagingSenderId: "424446705755",
+  appId: "1:424446705755:web:685456892782994530ff7e"
+};
 
-const LOBBY_ID =
-    "horror-world-lobby-2026";
 
-let peer;
-let myId;
-let host = false;
+const firebaseApp = initializeApp(firebaseConfig);
+
+const auth = getAuth(firebaseApp);
+
+const db = getDatabase(firebaseApp);
+
+
+/* =========================================================
+   THREE.JS
+   ========================================================= */
+
+import * as THREE
+from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+
+
+/* =========================================================
+   VARIABLES
+   ========================================================= */
+
+let myId = null;
+let myPlayerRef = null;
+
+let players = {};
+
 let isMonster = false;
 
-const connections = [];
+let gameStarted = false;
 
-const players = {};
+let flashlightOn = true;
 
-let connected = false;
+const keys = {};
 
+let velocityY = 0;
 
-// ======================================================
-// PEERJS
-// ======================================================
+const speed = 5;
 
-function startPeer(){
+const sprintSpeed = 8;
 
-    peer = new Peer(LOBBY_ID,{
-        debug:1
-    });
+const gravity = 18;
 
-    peer.on("open",id=>{
+const jumpPower = 8;
 
-        myId=id;
-        host=true;
-        isMonster=true;
 
-        connected=true;
+/* =========================================================
+   THREE SETUP
+   ========================================================= */
 
-        createNetworkPlayer();
+const scene = new THREE.Scene();
 
-        updateRole();
+scene.background = new THREE.Color(0x030303);
 
-        document.getElementById(
-            "connection"
-        ).textContent =
-            "Lobby erstellt – du bist das Monster.";
+scene.fog = new THREE.FogExp2(
+  0x050505,
+  0.035
+);
 
-    });
 
+const camera = new THREE.PerspectiveCamera(
+  75,
+  innerWidth / innerHeight,
+  0.1,
+  500
+);
 
-    peer.on("error",err=>{
 
-        console.log("Peer:",err.type);
+camera.position.set(
+  0,
+  1.7,
+  5
+);
 
-        if(
-            err.type==="unavailable-id"
-        ){
 
-            host=false;
+const renderer = new THREE.WebGLRenderer({
+  antialias: true
+});
 
-            peer.destroy();
-
-            setTimeout(
-                joinLobby,
-                300
-            );
-        }
-
-    });
-
-
-    peer.on("connection",conn=>{
-
-        if(!host)
-            return;
-
-        setupConnection(conn);
-
-    });
-
-}
-
-
-function joinLobby(){
-
-    peer = new Peer();
-
-    peer.on("open",id=>{
-
-        myId=id;
-
-        const conn =
-            peer.connect(
-                LOBBY_ID,
-                {
-                    reliable:true
-                }
-            );
-
-        setupConnection(conn);
-
-    });
-
-}
-
-
-function setupConnection(conn){
-
-    conn.on("open",()=>{
-
-        if(
-            !connections.includes(conn)
-        ){
-
-            connections.push(conn);
-
-        }
-
-
-        connected=true;
-
-
-        if(host){
-
-            conn.send({
-
-                type:"welcome",
-
-                monster:false,
-
-                players:getNetworkPlayers()
-
-            });
-
-        }
-
-    });
-
-
-    conn.on("data",data=>{
-
-        handleNetworkData(
-            data,
-            conn
-        );
-
-    });
-
-
-    conn.on("close",()=>{
-
-        const index =
-            connections.indexOf(conn);
-
-        if(index>=0)
-            connections.splice(index,1);
-
-    });
-
-}
-
-
-function broadcast(data,except=null){
-
-    for(
-        const conn
-        of connections
-    ){
-
-        if(
-            conn!==except &&
-            conn.open
-        ){
-
-            conn.send(data);
-
-        }
-
-    }
-
-}
-
-
-// ======================================================
-// NETWORK PLAYER
-// ======================================================
-
-function createNetworkPlayer(){
-
-    players[myId]={
-        id:myId,
-        x:player.position.x,
-        y:player.position.y,
-        z:player.position.z,
-        yaw:0,
-        monster:isMonster
-    };
-
-}
-
-
-function getNetworkPlayers(){
-
-    return Object.values(players);
-
-}
-
-
-function sendState(){
-
-    if(!connected)
-        return;
-
-
-    const data={
-
-        type:"state",
-
-        id:myId,
-
-        x:player.position.x,
-
-        y:player.position.y,
-
-        z:player.position.z,
-
-        yaw:yaw,
-
-        monster:isMonster
-
-    };
-
-
-    if(host){
-
-        players[myId]={
-            ...players[myId],
-            ...data
-        };
-
-        broadcast(data);
-
-    }else{
-
-        for(
-            const conn
-            of connections
-        ){
-
-            if(conn.open){
-
-                conn.send(data);
-
-            }
-
-        }
-
-    }
-
-}
-
-
-function handleNetworkData(data,conn){
-
-    if(
-        data.type==="welcome"
-    ){
-
-        isMonster=false;
-
-        updateRole();
-
-        if(
-            data.players
-        ){
-
-            for(
-                const p
-                of data.players
-            ){
-
-                players[p.id]=p;
-
-                if(
-                    p.id!==myId
-                )
-                    createRemote(p);
-
-            }
-
-        }
-
-        conn.send({
-
-            type:"join",
-
-            id:myId,
-
-            x:player.position.x,
-
-            y:player.position.y,
-
-            z:player.position.z,
-
-            monster:false
-
-        });
-
-    }
-
-
-    if(
-        data.type==="join"
-    ){
-
-        players[data.id]=data;
-
-        createRemote(data);
-
-        broadcast(
-            data,
-            conn
-        );
-
-    }
-
-
-    if(
-        data.type==="state"
-    ){
-
-        players[data.id]=data;
-
-        updateRemote(data);
-
-        if(host)
-            broadcast(data,conn);
-
-    }
-
-
-    if(
-        data.type==="flash"
-    ){
-
-        if(
-            data.owner!==myId
-        ){
-
-            explodeFlashbang(
-                new THREE.Vector3(
-                    data.x,
-                    data.y,
-                    data.z
-                ),
-                data.strength
-            );
-
-        }
-
-    }
-
-
-    if(
-        data.type==="monsterAbility"
-    ){
-
-        if(
-            data.target===myId
-        ){
-
-            monsterJumpscare();
-
-        }
-
-    }
-
-
-    if(
-        data.type==="dead"
-    ){
-
-        if(
-            data.target===myId
-        ){
-
-            loseGame();
-
-        }
-
-    }
-
-}
-
-
-// ======================================================
-// 3D SCENE
-// ======================================================
-
-const scene =
-    new THREE.Scene();
-
-scene.background =
-    new THREE.Color(0x030504);
-
-scene.fog =
-    new THREE.FogExp2(
-        0x050806,
-        .012
-    );
-
-
-// ======================================================
-// CAMERA
-// ======================================================
-
-const camera =
-    new THREE.PerspectiveCamera(
-        75,
-        innerWidth/innerHeight,
-        .1,
-        500
-    );
-
-
-// ======================================================
-// RENDERER
-// ======================================================
-
-const renderer =
-    new THREE.WebGLRenderer({
-        antialias:true
-    });
 
 renderer.setSize(
-    innerWidth,
-    innerHeight
+  innerWidth,
+  innerHeight
 );
+
 
 renderer.setPixelRatio(
-    Math.min(
-        devicePixelRatio,
-        2
-    )
-);
-
-renderer.shadowMap.enabled=true;
-
-renderer.shadowMap.type =
-    THREE.PCFSoftShadowMap;
-
-document.body.appendChild(
-    renderer.domElement
+  Math.min(devicePixelRatio, 2)
 );
 
 
-// ======================================================
-// LIGHT
-// ======================================================
+renderer.shadowMap.enabled = true;
 
-scene.add(
-    new THREE.HemisphereLight(
-        0x44505a,
-        0x080a08,
-        .35
-    )
+
+document
+  .getElementById("game")
+  .appendChild(renderer.domElement);
+
+
+/* =========================================================
+   LIGHTING
+   ========================================================= */
+
+const ambient = new THREE.HemisphereLight(
+  0x444444,
+  0x080808,
+  0.35
 );
 
+scene.add(ambient);
 
-const moon =
-    new THREE.DirectionalLight(
-        0x73849a,
-        1.2
-    );
+
+const moon = new THREE.DirectionalLight(
+  0x778899,
+  0.5
+);
 
 moon.position.set(
-    -40,
-    70,
-    -30
+  30,
+  50,
+  20
 );
 
-moon.castShadow=true;
-
-moon.shadow.mapSize.width=2048;
-moon.shadow.mapSize.height=2048;
+moon.castShadow = true;
 
 scene.add(moon);
 
 
-// ======================================================
-// TASCHENLAMPE
-// ======================================================
+/* =========================================================
+   FLASHLIGHT
+   ========================================================= */
 
-let flashlightOn=true;
+const flashlight = new THREE.SpotLight(
+  0xffffff,
+  5,
+  35,
+  Math.PI / 7,
+  0.5,
+  1
+);
 
-const flashlight =
-    new THREE.SpotLight(
-        0xffffff,
-        8,
-        60,
-        Math.PI/7,
-        .35,
-        1
-    );
+flashlight.position.set(
+  0,
+  1.65,
+  0
+);
 
-flashlight.castShadow=true;
+flashlight.target.position.set(
+  0,
+  1.5,
+  -10
+);
 
 scene.add(flashlight);
+
 scene.add(flashlight.target);
 
 
-// ======================================================
-// WORLD
-// ======================================================
+/* =========================================================
+   GROUND
+   ========================================================= */
 
-const obstacles=[];
+const groundMaterial =
+  new THREE.MeshStandardMaterial({
+    color: 0x151515,
+    roughness: 1
+  });
 
 
 const ground =
-    new THREE.Mesh(
+  new THREE.Mesh(
+    new THREE.PlaneGeometry(
+      300,
+      300
+    ),
+    groundMaterial
+  );
 
-        new THREE.PlaneGeometry(
-            240,
-            240
-        ),
 
-        new THREE.MeshStandardMaterial({
-            color:0x111812,
-            roughness:1
-        })
+ground.rotation.x = -Math.PI / 2;
 
-    );
-
-ground.rotation.x=-Math.PI/2;
-
-ground.receiveShadow=true;
+ground.receiveShadow = true;
 
 scene.add(ground);
 
 
-// ======================================================
-// WÄNDE
-// ======================================================
+/* =========================================================
+   ROAD
+   ========================================================= */
 
-function wall(
+const roadMaterial =
+  new THREE.MeshStandardMaterial({
+    color: 0x202020
+  });
+
+
+const road =
+  new THREE.Mesh(
+    new THREE.PlaneGeometry(
+      25,
+      300
+    ),
+    roadMaterial
+  );
+
+
+road.rotation.x = -Math.PI / 2;
+
+road.position.y = 0.01;
+
+scene.add(road);
+
+
+/* =========================================================
+   HOUSE FUNCTION
+   ========================================================= */
+
+function createHouse(x, z) {
+
+  const group = new THREE.Group();
+
+
+  const wallMaterial =
+    new THREE.MeshStandardMaterial({
+      color: 0x242424
+    });
+
+
+  const roofMaterial =
+    new THREE.MeshStandardMaterial({
+      color: 0x101010
+    });
+
+
+  const walls =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        12,
+        6,
+        10
+      ),
+      wallMaterial
+    );
+
+
+  walls.position.y = 3;
+
+  walls.castShadow = true;
+
+  walls.receiveShadow = true;
+
+  group.add(walls);
+
+
+  const roof =
+    new THREE.Mesh(
+      new THREE.ConeGeometry(
+        8,
+        4,
+        4
+      ),
+      roofMaterial
+    );
+
+
+  roof.rotation.y =
+    Math.PI / 4;
+
+  roof.position.y = 8;
+
+  roof.castShadow = true;
+
+  group.add(roof);
+
+
+  group.position.set(
     x,
-    y,
-    z,
-    w,
-    h,
-    d,
-    color=0x303331
-){
+    0,
+    z
+  );
 
-    const mesh =
-        new THREE.Mesh(
 
-            new THREE.BoxGeometry(
-                w,h,d
-            ),
-
-            new THREE.MeshStandardMaterial({
-                color,
-                roughness:.9
-            })
-
-        );
-
-    mesh.position.set(
-        x,y,z
-    );
-
-    mesh.castShadow=true;
-    mesh.receiveShadow=true;
-
-    scene.add(mesh);
-
-    obstacles.push(mesh);
-
-    return mesh;
-
+  scene.add(group);
 }
 
 
-// ======================================================
-// HAUS
-// ======================================================
-
-function house(x,z,s=1){
-
-    const w=16*s;
-    const d=13*s;
-    const h=6*s;
-
-    wall(
-        x,
-        h/2,
-        z-d/2,
-        w,
-        h,
-        .5*s
-    );
-
-    wall(
-        x-w/2,
-        h/2,
-        z,
-        .5*s,
-        h,
-        d
-    );
-
-    wall(
-        x+w/2,
-        h/2,
-        z,
-        .5*s,
-        h,
-        d
-    );
-
-    wall(
-        x-w*.32,
-        h/2,
-        z+d/2,
-        w*.35,
-        h,
-        .5*s
-    );
-
-    wall(
-        x+w*.32,
-        h/2,
-        z+d/2,
-        w*.35,
-        h,
-        .5*s
-    );
-
-
-    // Dach
-
-    const roof =
-        new THREE.Mesh(
-
-            new THREE.ConeGeometry(
-                w*.75,
-                5*s,
-                4
-            ),
-
-            new THREE.MeshStandardMaterial({
-                color:0x151615,
-                roughness:1
-            })
-
-        );
-
-    roof.position.set(
-        x,
-        h+2.5*s,
-        z
-    );
-
-    roof.rotation.y=Math.PI/4;
-
-    roof.castShadow=true;
-
-    scene.add(roof);
-
-
-    // Fenster
-
-    for(
-        const wx
-        of [-w*.3,w*.3]
-    ){
-
-        const windowMesh =
-            new THREE.Mesh(
-
-                new THREE.BoxGeometry(
-                    2*s,
-                    1.5*s,
-                    .1
-                ),
-
-                new THREE.MeshStandardMaterial({
-                    color:0x5f704e,
-                    emissive:0x243018,
-                    emissiveIntensity:1
-                })
-
-            );
-
-        windowMesh.position.set(
-            x+wx,
-            h*.6,
-            z+d/2+.3
-        );
-
-        scene.add(windowMesh);
-
-    }
-
-}
-
-
-house(18,-20,1.5);
-house(-25,-35,1.3);
-house(35,25,1.4);
-house(-40,35,1.2);
-house(5,-65,1.1);
-
-
-// ======================================================
-// GRABSTEINE
-// ======================================================
-
-function grave(x,z){
-
-    const stone =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                .8,
-                1.2,
-                .25
-            ),
-
-            new THREE.MeshStandardMaterial({
-                color:0x484b48,
-                roughness:1
-            })
-
-        );
-
-    stone.position.set(
-        x,
-        .6,
-        z
-    );
-
-    stone.castShadow=true;
-
-    scene.add(stone);
-
-    obstacles.push(stone);
-
-}
-
-
-function createGraveyard(){
-
-    for(
-        let i=0;
-        i<45;
-        i++
-    ){
-
-        const x=
-            -55+
-            Math.random()*30;
-
-        const z=
-            -5+
-            Math.random()*50;
-
-        grave(x,z);
-
-    }
-
-
-    // Kapelle
-
-    wall(
-        -40,
-        2.5,
-        20,
-        10,
-        5,
-        7,
-        0x252625
-    );
-
-}
-
-
-createGraveyard();
-
-
-// ======================================================
-// BÄUME
-// ======================================================
-
-function tree(x,z,s=1){
-
-    const trunk =
-        new THREE.Mesh(
-
-            new THREE.CylinderGeometry(
-                .45*s,
-                .65*s,
-                5*s,
-                8
-            ),
-
-            new THREE.MeshStandardMaterial({
-                color:0x2b1d15
-            })
-
-        );
-
-    trunk.position.set(
-        x,
-        2.5*s,
-        z
-    );
-
-    trunk.castShadow=true;
-
-    scene.add(trunk);
-
-    obstacles.push(trunk);
-
-
-    const leaves =
-        new THREE.Mesh(
-
-            new THREE.ConeGeometry(
-                3*s,
-                7*s,
-                8
-            ),
-
-            new THREE.MeshStandardMaterial({
-                color:0x0c1710,
-                roughness:1
-            })
-
-        );
-
-    leaves.position.set(
-        x,
-        7*s,
-        z
-    );
-
-    leaves.castShadow=true;
-
-    scene.add(leaves);
-
-}
-
-
-for(
-    let i=0;
-    i<150;
-    i++
-){
-
-    const x =
-        (Math.random()<.5?-1:1)*
-        (48+Math.random()*55);
-
-    const z =
-        -100+
-        Math.random()*200;
-
-    tree(
-        x,
-        z,
-        .7+
-        Math.random()*.9
-    );
-
-}
-
-
-// ======================================================
-// KERZEN
-// ======================================================
-
-function candle(x,z){
-
-    const wax =
-        new THREE.Mesh(
-
-            new THREE.CylinderGeometry(
-                .12,
-                .12,
-                .7,
-                8
-            ),
-
-            new THREE.MeshStandardMaterial({
-                color:0xd8d0b0
-            })
-
-        );
-
-    wax.position.set(
-        x,
+/* =========================================================
+   HOUSES
+   ========================================================= */
+
+createHouse(-35, -25);
+createHouse(35, -40);
+createHouse(-40, 30);
+createHouse(40, 25);
+createHouse(-55, -65);
+createHouse(55, -80);
+
+
+/* =========================================================
+   TREES
+   ========================================================= */
+
+function createTree(x, z) {
+
+  const trunk =
+    new THREE.Mesh(
+      new THREE.CylinderGeometry(
         .35,
-        z
-    );
-
-    scene.add(wax);
-
-
-    const flame =
-        new THREE.PointLight(
-            0xff9d42,
-            3,
-            8
-        );
-
-    flame.position.set(
-        x,
-        .9,
-        z
-    );
-
-    scene.add(flame);
-
-}
-
-
-for(
-    let i=0;
-    i<25;
-    i++
-){
-
-    candle(
-        -45+
-        Math.random()*25,
-
-        5+
-        Math.random()*40
-    );
-
-}
-
-
-// ======================================================
-// PLAYER
-// ======================================================
-
-const player={
-
-    position:
-        new THREE.Vector3(
-            0,
-            1,
-            10
-        ),
-
-    velocityY:0,
-
-    height:1.8,
-
-    radius:.38,
-
-    grounded:true,
-
-    walkSpeed:6,
-
-    sprintSpeed:10
-
-};
-
-
-// ======================================================
-// PLAYER PHYSIK
-// ======================================================
-
-function collides(pos){
-
-    const playerBox =
-        new THREE.Box3();
-
-    playerBox.setFromCenterAndSize(
-
-        new THREE.Vector3(
-            pos.x,
-            pos.y,
-            pos.z
-        ),
-
-        new THREE.Vector3(
-            player.radius*2,
-            player.height,
-            player.radius*2
-        )
-
+        .5,
+        4
+      ),
+      new THREE.MeshStandardMaterial({
+        color: 0x24160e
+      })
     );
 
 
-    const box =
-        new THREE.Box3();
+  trunk.position.set(
+    x,
+    2,
+    z
+  );
 
 
-    for(
-        const obstacle
-        of obstacles
-    ){
+  trunk.castShadow = true;
 
-        box.setFromObject(
-            obstacle
-        );
+  scene.add(trunk);
 
-        if(
-            playerBox.intersectsBox(box)
-        )
-            return true;
 
-    }
+  const leaves =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        2.5,
+        8,
+        8
+      ),
+      new THREE.MeshStandardMaterial({
+        color: 0x101d12
+      })
+    );
 
-    return false;
 
+  leaves.position.set(
+    x,
+    5,
+    z
+  );
+
+
+  leaves.castShadow = true;
+
+  scene.add(leaves);
 }
 
 
-function movePlayer(dt){
+for (
+  let i = 0;
+  i < 70;
+  i++
+) {
 
-    const dir =
-        new THREE.Vector3();
+  const x =
+    (Math.random() - .5) * 260;
 
-
-    if(keys.KeyW)dir.z-=1;
-    if(keys.KeyS)dir.z+=1;
-    if(keys.KeyA)dir.x-=1;
-    if(keys.KeyD)dir.x+=1;
-
-
-    if(dir.length()>0){
-
-        dir.normalize();
-
-        dir.applyAxisAngle(
-            new THREE.Vector3(0,1,0),
-            yaw
-        );
+  const z =
+    (Math.random() - .5) * 260;
 
 
-        const sprint =
-            keys.ShiftLeft ||
-            keys.ShiftRight;
+  if (
+    Math.abs(x) < 20
+  ) continue;
 
 
-        const speed =
-            sprint
-            ?player.sprintSpeed
-            :player.walkSpeed;
-
-
-        const nextX =
-            player.position.clone();
-
-        nextX.x +=
-            dir.x*
-            speed*
-            dt;
-
-
-        if(
-            !collides(nextX)
-        ){
-
-            player.position.x=
-                nextX.x;
-
-        }
-
-
-        const nextZ =
-            player.position.clone();
-
-        nextZ.z +=
-            dir.z*
-            speed*
-            dt;
-
-
-        if(
-            !collides(nextZ)
-        ){
-
-            player.position.z=
-                nextZ.z;
-
-        }
-
-    }
-
-
-    // Gravitation
-
-    player.velocityY -=
-        19.6*dt;
-
-
-    player.position.y +=
-        player.velocityY*dt;
-
-
-    if(
-        player.position.y<=1
-    ){
-
-        player.position.y=1;
-
-        player.velocityY=0;
-
-        player.grounded=true;
-
-    }
-
+  createTree(
+    x,
+    z
+  );
 }
 
 
-// ======================================================
-// TASTEN
-// ======================================================
+/* =========================================================
+   CEMETERY
+   ========================================================= */
 
-const keys={};
+function createGrave(x, z) {
 
-
-window.addEventListener(
-    "keydown",
-    e=>{
-
-        keys[e.code]=true;
-
-
-        if(
-            e.code==="Space" &&
-            player.grounded
-        ){
-
-            player.velocityY=7;
-
-            player.grounded=false;
-
-        }
+  const grave =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        1.2,
+        1.5,
+        .4
+      ),
+      new THREE.MeshStandardMaterial({
+        color: 0x333333
+      })
+    );
 
 
-        if(
-            e.code==="KeyF" &&
-            !e.repeat
-        ){
-
-            flashlightOn=
-                !flashlightOn;
-
-            flashlight.visible=
-                flashlightOn;
-
-            document.getElementById(
-                "flashlight"
-            ).textContent=
-                flashlightOn
-                ?"🔦 Taschenlampe: AN"
-                :"🔦 Taschenlampe: AUS";
-
-        }
+  grave.position.set(
+    x,
+    .75,
+    z
+  );
 
 
-        if(
-            e.code==="KeyQ" &&
-            !e.repeat
-        ){
-
-            ability();
-
-        }
-
-    });
+  grave.rotation.y =
+    (Math.random() - .5) * .4;
 
 
-window.addEventListener(
-    "keyup",
-    e=>{
-        keys[e.code]=false;
-    });
+  grave.castShadow = true;
+
+  scene.add(grave);
+}
 
 
-// ======================================================
-// MAUS
-// ======================================================
+for (
+  let i = 0;
+  i < 25;
+  i++
+) {
 
-let yaw=0;
-let pitch=0;
+  createGrave(
+    75 + (i % 5) * 3,
+    40 + Math.floor(i / 5) * 4
+  );
+}
+
+
+/* =========================================================
+   PLAYER
+   ========================================================= */
+
+const player =
+  new THREE.Group();
+
+
+const body =
+  new THREE.Mesh(
+    new THREE.CapsuleGeometry(
+      .35,
+      1.0,
+      4,
+      8
+    ),
+    new THREE.MeshStandardMaterial({
+      color: 0xdddddd
+    })
+  );
+
+
+body.position.y = 1;
+
+body.castShadow = true;
+
+player.add(body);
+
+
+scene.add(player);
+
+
+/* =========================================================
+   PLAYER MOVEMENT
+   ========================================================= */
+
+let rotationY = 0;
+
+let rotationX = 0;
 
 
 document.addEventListener(
-    "mousemove",
-    e=>{
+  "keydown",
+  e => {
 
-        if(
-            document.pointerLockElement
-            !==renderer.domElement
+    keys[e.code] = true;
+
+
+    if (
+      e.code === "KeyF"
+    ) {
+
+      flashlightOn =
+        !flashlightOn;
+
+      flashlight.visible =
+        flashlightOn;
+    }
+  }
+);
+
+
+document.addEventListener(
+  "keyup",
+  e => {
+
+    keys[e.code] = false;
+
+  }
+);
+
+
+document.addEventListener(
+  "mousemove",
+  e => {
+
+    if (!gameStarted)
+      return;
+
+
+    rotationY -=
+      e.movementX * 0.002;
+
+
+    rotationX -=
+      e.movementY * 0.002;
+
+
+    rotationX =
+      Math.max(
+        -1.4,
+        Math.min(
+          1.4,
+          rotationX
         )
-            return;
+      );
+  }
+);
 
 
-        yaw -=
-            e.movementX*.002;
+renderer.domElement.addEventListener(
+  "click",
+  () => {
 
-        pitch -=
-            e.movementY*.002;
+    if (
+      gameStarted &&
+      document.pointerLockElement !==
+      renderer.domElement
+    ) {
+
+      renderer.domElement.requestPointerLock();
+
+    }
+
+  }
+);
 
 
-        pitch=
-            Math.max(
-                -1.45,
-                Math.min(
-                    1.45,
-                    pitch
-                )
-            );
+/* =========================================================
+   JUMP
+   ========================================================= */
 
-    });
+document.addEventListener(
+  "keydown",
+  e => {
+
+    if (
+      e.code === "Space" &&
+      Math.abs(velocityY) < 0.1
+    ) {
+
+      velocityY =
+        jumpPower;
+
+    }
+
+  }
+);
 
 
-// ======================================================
-// START
-// ======================================================
+/* =========================================================
+   FIREBASE LOGIN
+   ========================================================= */
 
-document.getElementById(
-    "startButton"
-).onclick=()=>{
+signInAnonymously(auth)
+  .catch(error => {
 
-    renderer.domElement
-        .requestPointerLock();
+    console.error(
+      "Firebase Login Fehler:",
+      error
+    );
 
     document.getElementById(
-        "menu"
-    ).style.display="none";
+      "status"
+    ).textContent =
+      "❌ Firebase Login Fehler";
 
-};
+  });
 
 
-// ======================================================
-// KAMERA
-// ======================================================
+/* =========================================================
+   AUTH STATE
+   ========================================================= */
 
-function updateCamera(){
+onAuthStateChanged(
+  auth,
+  async user => {
 
-    camera.position.copy(
-        player.position
+    if (!user)
+      return;
+
+
+    myId = user.uid;
+
+
+    myPlayerRef =
+      ref(
+        db,
+        "games/main/players/" +
+        myId
+      );
+
+
+    document.getElementById(
+      "status"
+    ).textContent =
+      "🟢 Firebase verbunden";
+
+
+    /*
+      Spieler registrieren
+    */
+
+    await set(
+      myPlayerRef,
+      {
+        x: 0,
+        y: 1,
+        z: 5,
+        rotation: 0,
+        online: true,
+        joinedAt: Date.now()
+      }
     );
 
-    camera.position.y+=.75;
 
-    camera.rotation.order="YXZ";
+    /*
+      Spieler automatisch entfernen,
+      wenn Browser geschlossen wird
+    */
 
-    camera.rotation.y=yaw;
+    onDisconnect(
+      myPlayerRef
+    ).remove();
 
-    camera.rotation.x=pitch;
+
+    /*
+      Monster bestimmen
+    */
+
+    const monsterRef =
+      ref(
+        db,
+        "games/main/monsterId"
+      );
 
 
-    flashlight.position.copy(
-        camera.position
+    const result =
+      await runTransaction(
+        monsterRef,
+        current => {
+
+          if (
+            current === null
+          ) {
+
+            return myId;
+
+          }
+
+          return current;
+
+        }
+      );
+
+
+    isMonster =
+      result.snapshot.val() === myId;
+
+
+    updateRoleUI();
+
+
+    /*
+      Andere Spieler beobachten
+    */
+
+    const playersRef =
+      ref(
+        db,
+        "games/main/players"
+      );
+
+
+    onValue(
+      playersRef,
+      snapshot => {
+
+        players =
+          snapshot.val() || {};
+
+
+        updatePlayers();
+
+      }
+    );
+
+  }
+);
+
+
+/* =========================================================
+   ROLE UI
+   ========================================================= */
+
+function updateRoleUI() {
+
+  const role =
+    document.getElementById(
+      "role"
     );
 
 
-    const dir =
-        new THREE.Vector3(
-            0,
-            0,
-            -1
+  if (isMonster) {
+
+    role.textContent =
+      "👹 Rolle: MONSTER";
+
+  } else {
+
+    role.textContent =
+      "🏃 Rolle: GEJAGTER";
+
+  }
+
+}
+
+
+/* =========================================================
+   PLAYER COUNT
+   ========================================================= */
+
+function updatePlayers() {
+
+  const count =
+    Object.keys(
+      players
+    ).length;
+
+
+  document.getElementById(
+    "players"
+  ).textContent =
+    "Spieler: " + count;
+
+
+  /*
+    Andere Spieler erstellen
+  */
+
+  for (
+    const id in players
+  ) {
+
+    if (
+      id === myId
+    ) continue;
+
+
+    const data =
+      players[id];
+
+
+    if (
+      !data.mesh
+    ) {
+
+      const material =
+        new THREE.MeshStandardMaterial({
+          color:
+            id === players.monsterId
+              ? 0xff0000
+              : 0x4488ff
+        });
+
+
+      const mesh =
+        new THREE.Mesh(
+          new THREE.CapsuleGeometry(
+            .35,
+            1,
+            4,
+            8
+          ),
+          material
         );
 
-    dir.applyQuaternion(
-        camera.quaternion
+
+      mesh.castShadow =
+        true;
+
+
+      mesh.userData.playerId =
+        id;
+
+
+      scene.add(mesh);
+
+
+      players[id].mesh =
+        mesh;
+
+    }
+
+
+    const mesh =
+      players[id].mesh;
+
+
+    if (
+      mesh
+    ) {
+
+      mesh.position.set(
+        data.x || 0,
+        data.y || 1,
+        data.z || 0
+      );
+
+      mesh.rotation.y =
+        data.rotation || 0;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   SEND POSITION
+   ========================================================= */
+
+let lastNetworkUpdate = 0;
+
+
+function sendPosition(
+  time
+) {
+
+  if (
+    !myPlayerRef ||
+    time - lastNetworkUpdate < 50
+  ) return;
+
+
+  lastNetworkUpdate =
+    time;
+
+
+  update(
+    myPlayerRef,
+    {
+      x: player.position.x,
+      y: player.position.y,
+      z: player.position.z,
+      rotation: rotationY,
+      online: true
+    }
+  );
+
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+document
+  .getElementById(
+    "startButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      gameStarted =
+        true;
+
+
+      document.getElementById(
+        "start"
+      ).style.display =
+        "none";
+
+
+      renderer.domElement.requestPointerLock();
+
+    }
+  );
+
+
+/* =========================================================
+   GAME LOOP
+   ========================================================= */
+
+let previousTime =
+  performance.now();
+
+
+function animate(
+  time
+) {
+
+  requestAnimationFrame(
+    animate
+  );
+
+
+  const dt =
+    Math.min(
+      (time - previousTime) / 1000,
+      .05
+    );
+
+
+  previousTime =
+    time;
+
+
+  if (
+    gameStarted
+  ) {
+
+    let moveSpeed =
+      keys["ShiftLeft"] ||
+      keys["ShiftRight"]
+        ? sprintSpeed
+        : speed;
+
+
+    let forward = 0;
+    let sideways = 0;
+
+
+    if (
+      keys["KeyW"]
+    ) forward += 1;
+
+    if (
+      keys["KeyS"]
+    ) forward -= 1;
+
+    if (
+      keys["KeyA"]
+    ) sideways -= 1;
+
+    if (
+      keys["KeyD"]
+    ) sideways += 1;
+
+
+    const direction =
+      new THREE.Vector3(
+        sideways,
+        0,
+        -forward
+      );
+
+
+    if (
+      direction.length() > 0
+    ) {
+
+      direction.normalize();
+
+
+      direction.applyAxisAngle(
+        new THREE.Vector3(
+          0,
+          1,
+          0
+        ),
+        rotationY
+      );
+
+
+      player.position.add(
+        direction.multiplyScalar(
+          moveSpeed * dt
+        )
+      );
+
+    }
+
+
+    /*
+      Gravitation
+    */
+
+    velocityY -=
+      gravity * dt;
+
+
+    player.position.y +=
+      velocityY * dt;
+
+
+    if (
+      player.position.y < 0
+    ) {
+
+      player.position.y =
+        0;
+
+      velocityY =
+        0;
+
+    }
+
+
+    /*
+      Kamera
+    */
+
+    camera.position.copy(
+      player.position
+    );
+
+
+    camera.position.y +=
+      1.7;
+
+
+    camera.rotation.order =
+      "YXZ";
+
+
+    camera.rotation.y =
+      rotationY;
+
+
+    camera.rotation.x =
+      rotationX;
+
+
+    /*
+      Taschenlampe folgt Kamera
+    */
+
+    flashlight.position.copy(
+      camera.position
+    );
+
+
+    const target =
+      new THREE.Vector3(
+        0,
+        0,
+        -10
+      );
+
+
+    target.applyQuaternion(
+      camera.quaternion
     );
 
 
     flashlight.target.position.copy(
-        camera.position
+      camera.position
+    ).add(
+      target
     );
 
-    flashlight.target.position.add(
-        dir.multiplyScalar(25)
-    );
+
+    sendPosition(time);
+
+  }
+
+
+  renderer.render(
+    scene,
+    camera
+  );
 
 }
 
-
-// ======================================================
-// REMOTE PLAYERS
-// ======================================================
-
-const remoteMeshes={};
-
-
-function createRemote(data){
-
-    if(
-        remoteMeshes[data.id]
-    )
-        return;
-
-
-    const group =
-        new THREE.Group();
-
-
-    // Körper
-
-    const body =
-        new THREE.Mesh(
-
-            new THREE.CapsuleGeometry(
-                .32,
-                .8,
-                8,
-                12
-            ),
-
-            new THREE.MeshStandardMaterial({
-                color:
-                    data.monster
-                    ?0x180000
-                    :0x334d61
-            })
-
-        );
-
-    body.position.y=.85;
-
-    body.castShadow=true;
-
-    group.add(body);
-
-
-    // Kopf
-
-    const head =
-        new THREE.Mesh(
-
-            new THREE.SphereGeometry(
-                .28,
-                16,
-                16
-            ),
-
-            new THREE.MeshStandardMaterial({
-                color:
-                    data.monster
-                    ?0x260000
-                    :0xb0a095
-            })
-
-        );
-
-    head.position.y=1.7;
-
-    head.castShadow=true;
-
-    group.add(head);
-
-
-    // Monster Augen
-
-    if(data.monster){
-
-        for(
-            const x
-            of [-.1,.1]
-        ){
-
-            const eye =
-                new THREE.Mesh(
-
-                    new THREE.SphereGeometry(
-                        .055,
-                        8,
-                        8
-                    ),
-
-                    new THREE.MeshBasicMaterial({
-                        color:0xff0000
-                    })
-
-                );
-
-            eye.position.set(
-                x,
-                1.73,
-                -.25
-            );
-
-            group.add(eye);
-
-        }
-
-    }
-
-
-    scene.add(group);
-
-
-    remoteMeshes[data.id]=group;
-
-}
-
-
-function updateRemote(data){
-
-    if(
-        data.id===myId
-    )
-        return;
-
-
-    createRemote(data);
-
-
-    const mesh =
-        remoteMeshes[data.id];
-
-
-    mesh.position.set(
-        data.x,
-        data.y-1,
-        data.z
-    );
-
-    mesh.rotation.y=data.yaw;
-
-
-    // Monsterfarbe
-
-    if(data.monster){
-
-        mesh.children[0]
-            .material.color.set(
-                0x180000
-            );
-
-    }
-
-}
-
-
-// ======================================================
-// MONSTER / GEJAGTE
-// ======================================================
-
-function updateRole(){
-
-    document.getElementById(
-        "role"
-    ).textContent=
-
-        isMonster
-        ?"👹 DU BIST DAS MONSTER"
-        :"👤 DU WIRST GEJAGT";
-
-}
-
-
-function checkMonster(){
-
-    if(!isMonster)
-        return;
-
-
-    for(
-        const id in players
-    ){
-
-        if(id===myId)
-            continue;
-
-
-        const p=
-            players[id];
-
-
-        if(!p || p.monster)
-            continue;
-
-
-        const distance =
-            player.position.distanceTo(
-                new THREE.Vector3(
-                    p.x,
-                    p.y,
-                    p.z
-                )
-            );
-
-
-        if(
-            distance<1.5
-        ){
-
-            broadcast({
-
-                type:"dead",
-
-                target:id
-
-            });
-
-
-        }
-
-    }
-
-}
-
-
-// ======================================================
-// Q FÄHIGKEIT
-// ======================================================
-
-let abilityCooldown=0;
-
-
-function ability(){
-
-    if(
-        abilityCooldown>0
-    )
-        return;
-
-
-    abilityCooldown=6;
-
-
-    if(isMonster){
-
-        let closest=null;
-
-        let distance=999;
-
-
-        for(
-            const id in players
-        ){
-
-            const p=players[id];
-
-            if(
-                p.monster
-            )
-                continue;
-
-
-            const d=
-                player.position.distanceTo(
-                    new THREE.Vector3(
-                        p.x,
-                        p.y,
-                        p.z
-                    )
-                );
-
-
-            if(
-                d<distance
-            ){
-
-                distance=d;
-                closest=p;
-
-            }
-
-        }
-
-
-        // Monster zieht Kamera an
-
-        if(
-            closest &&
-            distance<18
-        ){
-
-            broadcast({
-
-                type:"monsterAbility",
-
-                target:closest.id
-
-            });
-
-        }
-
-    }else{
-
-        // Schwache Flashbang
-
-        throwFlashbang();
-
-    }
-
-}
-
-
-// ======================================================
-// FLASHBANG
-// ======================================================
-
-function throwFlashbang(){
-
-    const dir =
-        new THREE.Vector3(
-            0,
-            0,
-            -1
-        );
-
-    dir.applyQuaternion(
-        camera.quaternion
-    );
-
-
-    const pos =
-        camera.position.clone();
-
-
-    pos.add(
-        dir.clone().multiplyScalar(3)
-    );
-
-
-    explodeFlashbang(
-        pos,
-        .45
-    );
-
-
-    broadcast({
-
-        type:"flash",
-
-        owner:myId,
-
-        x:pos.x,
-
-        y:pos.y,
-
-        z:pos.z,
-
-        strength:.45
-
-    });
-
-}
-
-
-function explodeFlashbang(
-    position,
-    strength=1
-){
-
-    const light =
-        new THREE.PointLight(
-            0xffffff,
-            100*strength,
-            40
-        );
-
-    light.position.copy(
-        position
-    );
-
-    scene.add(light);
-
-
-    let power=1;
-
-
-    const interval=
-        setInterval(()=>{
-
-            power*=.78;
-
-            light.intensity=
-                100*
-                strength*
-                power;
-
-
-            if(
-                power<.02
-            ){
-
-                clearInterval(
-                    interval
-                );
-
-                scene.remove(light);
-
-            }
-
-        },40);
-
-
-    flashScreen(
-        position,
-        strength
-    );
-
-}
-
-
-// ======================================================
-// SCREEN FLASH
-// ======================================================
-
-function flashScreen(
-    position,
-    strength
-){
-
-    const distance=
-        camera.position.distanceTo(
-            position
-        );
-
-
-    const max=30;
-
-
-    if(distance>max)
-        return;
-
-
-    let power=
-        1-
-        distance/max;
-
-
-    power=
-        Math.pow(
-            Math.max(0,power),
-            .7
-        );
-
-
-    power*=strength;
-
-
-    const flash=
-        document.getElementById(
-            "flash"
-        );
-
-
-    flash.style.opacity=
-        Math.min(
-            1,
-            power
-        );
-
-
-    setTimeout(
-        ()=>{
-
-            flash.style.opacity=
-                power*.35;
-
-        },
-        120
-    );
-
-
-    setTimeout(
-        ()=>{
-
-            flash.style.opacity=0;
-
-        },
-        700
-    );
-
-}
-
-
-// ======================================================
-// MONSTER JUMPSCARE
-// ======================================================
-
-function monsterJumpscare(){
-
-    const element=
-        document.getElementById(
-            "jumpscare"
-        );
-
-
-    element.style.opacity=1;
-
-
-    const face=
-        document.getElementById(
-            "jumpscareFace"
-        );
-
-
-    face.style.transform=
-        "scale(1.5)";
-
-
-    setTimeout(
-        ()=>{
-
-            face.style.transform=
-                "scale(1)";
-
-        },
-        120
-    );
-
-
-    setTimeout(
-        ()=>{
-
-            element.style.opacity=0;
-
-        },
-        850
-    );
-
-}
-
-
-// ======================================================
-// VERLOREN
-// ======================================================
-
-function loseGame(){
-
-    document.exitPointerLock();
-
-    document.getElementById(
-        "dead"
-    ).style.display="flex";
-
-}
-
-
-// ======================================================
-// ATMOSPHÄRE
-// ======================================================
-
-let audioStarted=false;
-let audioCtx;
-
-
-function startAudio(){
-
-    if(audioStarted)
-        return;
-
-    audioStarted=true;
-
-    audioCtx=
-        new AudioContext();
-
-
-    // tiefer Horror-Droneton
-
-    const osc=
-        audioCtx.createOscillator();
-
-    const gain=
-        audioCtx.createGain();
-
-
-    osc.frequency.value=48;
-
-    gain.gain.value=.025;
-
-    osc.connect(gain);
-
-    gain.connect(
-        audioCtx.destination
-    );
-
-    osc.start();
-
-}
-
-
-document.addEventListener(
-    "click",
-    startAudio,
-    {once:true}
-);
-
-
-// ======================================================
-// DANGER
-// ======================================================
-
-function dangerEffect(){
-
-    if(!isMonster){
-
-        let nearest=999;
-
-
-        for(
-            const id in players
-        ){
-
-            const p=players[id];
-
-            if(
-                p.monster
-            ){
-
-                const d=
-                    player.position.distanceTo(
-                        new THREE.Vector3(
-                            p.x,
-                            p.y,
-                            p.z
-                        )
-                    );
-
-                nearest=
-                    Math.min(
-                        nearest,
-                        d
-                    );
-
-            }
-
-        }
-
-
-        if(nearest<15){
-
-            const intensity=
-                1-nearest/15;
-
-            document.getElementById(
-                "danger"
-            ).style.opacity=
-                intensity*.7;
-
-        }else{
-
-            document.getElementById(
-                "danger"
-            ).style.opacity=0;
-
-        }
-
-    }
-
-}
-
-
-// ======================================================
-// ANIMATION
-// ======================================================
-
-let last=
-    performance.now();
-
-let sendTimer=0;
-
-
-function animate(time){
-
-    requestAnimationFrame(
-        animate
-    );
-
-
-    const dt=
-        Math.min(
-            (time-last)/1000,
-            .05
-        );
-
-    last=time;
-
-
-    movePlayer(dt);
-
-    updateCamera();
-
-    sendTimer+=dt;
-
-
-    if(
-        sendTimer>.05
-    ){
-
-        sendTimer=0;
-
-        sendState();
-
-    }
-
-
-    checkMonster();
-
-    dangerEffect();
-
-
-    if(
-        abilityCooldown>0
-    ){
-
-        abilityCooldown-=dt;
-
-    }
-
-
-    document.getElementById(
-        "status"
-    ).textContent=
-
-        isMonster
-        ?"👹 JAGD – FINDE DIE GEJAGTEN"
-        :"👤 ÜBERLEBE – DAS MONSTER IST IRGENDWO HIER";
-
-
-    renderer.render(
-        scene,
-        camera
-    );
-
-}
-
-
-window.addEventListener(
-    "resize",
-    ()=>{
-
-        camera.aspect=
-            innerWidth/
-            innerHeight;
-
-        camera.updateProjectionMatrix();
-
-        renderer.setSize(
-            innerWidth,
-            innerHeight
-        );
-
-    }
-);
-
-
-// ======================================================
-// START MULTIPLAYER
-// ======================================================
-
-startPeer();
 
 animate(
-    performance.now()
+  performance.now()
+);
+
+
+/* =========================================================
+   RESIZE
+   ========================================================= */
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    camera.aspect =
+      innerWidth /
+      innerHeight;
+
+
+    camera.updateProjectionMatrix();
+
+
+    renderer.setSize(
+      innerWidth,
+      innerHeight
+    );
+
+  }
 );
 
 </script>
