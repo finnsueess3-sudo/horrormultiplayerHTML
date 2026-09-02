@@ -30,17 +30,19 @@ html, body {
     left: 15px;
     z-index: 10;
 
+    padding: 15px 20px;
+
     background: rgba(0,0,0,.7);
     color: white;
 
-    padding: 15px 20px;
     border-radius: 12px;
 
     font-size: 17px;
 }
 
 #status {
-    margin-top: 6px;
+    margin-top: 5px;
+    color: #7cff7c;
 }
 
 #startScreen {
@@ -57,7 +59,9 @@ html, body {
 
 #startBox {
     background: white;
+
     padding: 35px;
+
     border-radius: 15px;
 
     text-align: center;
@@ -67,6 +71,7 @@ html, body {
 
 button {
     border: none;
+
     padding: 15px 30px;
 
     border-radius: 10px;
@@ -153,18 +158,20 @@ button:hover {
 
 <div id="crosshair"></div>
 
+
 <div id="startScreen">
 
     <div id="startBox">
 
         <h1>HorrorWorld</h1>
 
-        <p>
-            Multiplayer-Test
-        </p>
+        <p>Multiplayer-Test</p>
 
         <p>
-            PC 1 und PC 2 müssen dieselbe Lobby benutzen.
+            <b>WASD</b> = Laufen<br>
+            <b>Shift</b> = Sprinten<br>
+            <b>Space</b> = Springen<br>
+            <b>Maus</b> = Kamera
         </p>
 
         <button id="startButton">
@@ -178,14 +185,15 @@ button:hover {
 
 <script type="module">
 
-/* =====================================================
+/* =========================================================
    FIREBASE
-===================================================== */
+========================================================= */
 
 import {
     initializeApp
 }
 from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
 
 import {
     getAuth,
@@ -194,12 +202,12 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
+
 import {
     getDatabase,
     ref,
     set,
     update,
-    remove,
     onValue,
     onDisconnect,
     runTransaction
@@ -226,7 +234,6 @@ const firebaseConfig = {
 
     appId:
         "1:424446705755:web:685456892782994530ff7e"
-
 };
 
 
@@ -240,7 +247,7 @@ const auth =
 
 /*
     WICHTIG:
-    Deine Datenbank ist in europe-west1.
+    Deine Datenbank befindet sich in europe-west1.
 */
 
 const db =
@@ -250,113 +257,128 @@ const db =
     );
 
 
-/* =====================================================
-   FESTE LOBBY
-===================================================== */
+/* =========================================================
+   LOBBY
+========================================================= */
 
 const LOBBY_ID = "lobby1";
 
 
-/*
-    ALLE Spieler benutzen exakt diesen Pfad:
+const lobbyPath =
+    "games/main/lobbies/" +
+    LOBBY_ID;
 
-    games
-      main
-        lobbies
-          lobby1
-            players
-*/
 
-const lobbyRef =
-    ref(
-        db,
-        "games/main/lobbies/" + LOBBY_ID
-    );
+const playersPath =
+    lobbyPath +
+    "/players";
+
+
+const monsterPath =
+    lobbyPath +
+    "/monsterId";
 
 
 const playersRef =
     ref(
         db,
-        "games/main/lobbies/" +
-        LOBBY_ID +
-        "/players"
+        playersPath
     );
 
 
 const monsterRef =
     ref(
         db,
-        "games/main/lobbies/" +
-        LOBBY_ID +
-        "/monsterId"
+        monsterPath
     );
 
 
-/* =====================================================
+/* =========================================================
    HTML
-===================================================== */
+========================================================= */
 
 const game =
     document.getElementById("game");
 
-const playerCount =
+
+const playerCountText =
     document.getElementById("playerCount");
+
 
 const roleText =
     document.getElementById("role");
 
+
 const statusText =
     document.getElementById("status");
 
+
 const startScreen =
     document.getElementById("startScreen");
+
 
 const startButton =
     document.getElementById("startButton");
 
 
-/* =====================================================
+/* =========================================================
    THREE.JS
-===================================================== */
+========================================================= */
 
 import * as THREE
 from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
 
+/* =========================================================
+   SCENE
+========================================================= */
+
 const scene =
     new THREE.Scene();
 
+
 scene.background =
-    new THREE.Color(0x87ceeb);
-
-
-/* =====================================================
-   CAMERA
-===================================================== */
-
-const camera =
-    new THREE.PerspectiveCamera(
-        75,
-        window.innerWidth /
-        window.innerHeight,
-        0.1,
-        1000
+    new THREE.Color(
+        0x87ceeb
     );
 
 
-/* =====================================================
+/* =========================================================
+   CAMERA
+========================================================= */
+
+const camera =
+    new THREE.PerspectiveCamera(
+
+        75,
+
+        window.innerWidth /
+        window.innerHeight,
+
+        0.1,
+
+        1000
+
+    );
+
+
+/* =========================================================
    RENDERER
-===================================================== */
+========================================================= */
 
 const renderer =
     new THREE.WebGLRenderer({
+
         antialias: true
+
     });
+
 
 renderer.setSize(
     window.innerWidth,
     window.innerHeight
 );
+
 
 renderer.setPixelRatio(
     Math.min(
@@ -365,16 +387,19 @@ renderer.setPixelRatio(
     )
 );
 
-renderer.shadowMap.enabled = true;
+
+renderer.shadowMap.enabled =
+    true;
+
 
 game.appendChild(
     renderer.domElement
 );
 
 
-/* =====================================================
+/* =========================================================
    LICHT
-===================================================== */
+========================================================= */
 
 const sun =
     new THREE.DirectionalLight(
@@ -382,28 +407,36 @@ const sun =
         2
     );
 
+
 sun.position.set(
     50,
     100,
     50
 );
 
-sun.castShadow = true;
+
+sun.castShadow =
+    true;
+
 
 scene.add(sun);
 
 
-scene.add(
+const ambient =
     new THREE.AmbientLight(
         0xffffff,
         1.2
-    )
+    );
+
+
+scene.add(
+    ambient
 );
 
 
-/* =====================================================
+/* =========================================================
    BODEN
-===================================================== */
+========================================================= */
 
 const ground =
     new THREE.Mesh(
@@ -414,22 +447,31 @@ const ground =
         ),
 
         new THREE.MeshStandardMaterial({
-            color: 0x55aa55
+
+            color:
+                0x55aa55
+
         })
 
     );
 
+
 ground.rotation.x =
     -Math.PI / 2;
 
-ground.receiveShadow = true;
 
-scene.add(ground);
+ground.receiveShadow =
+    true;
 
 
-/* =====================================================
+scene.add(
+    ground
+);
+
+
+/* =========================================================
    STRASSE
-===================================================== */
+========================================================= */
 
 const road =
     new THREE.Mesh(
@@ -441,19 +483,27 @@ const road =
         ),
 
         new THREE.MeshStandardMaterial({
-            color: 0x666666
+
+            color:
+                0x666666
+
         })
 
     );
 
-road.position.y = 0.05;
 
-scene.add(road);
+road.position.y =
+    0.05;
 
 
-/* =====================================================
+scene.add(
+    road
+);
+
+
+/* =========================================================
    STRASSENLINIEN
-===================================================== */
+========================================================= */
 
 for (
     let z = -140;
@@ -471,10 +521,14 @@ for (
             ),
 
             new THREE.MeshStandardMaterial({
-                color: 0xffffff
+
+                color:
+                    0xffffff
+
             })
 
         );
+
 
     line.position.set(
         0,
@@ -482,15 +536,21 @@ for (
         z
     );
 
-    scene.add(line);
+
+    scene.add(
+        line
+    );
 }
 
 
-/* =====================================================
+/* =========================================================
    HÄUSER
-===================================================== */
+========================================================= */
 
-function createHouse(x, z) {
+function createHouse(
+    x,
+    z
+) {
 
     const house =
         new THREE.Group();
@@ -506,16 +566,26 @@ function createHouse(x, z) {
             ),
 
             new THREE.MeshStandardMaterial({
-                color: 0xffd7a8
+
+                color:
+                    0xffd7a8
+
             })
 
         );
 
-    body.position.y = 3;
 
-    body.castShadow = true;
+    body.position.y =
+        3;
 
-    house.add(body);
+
+    body.castShadow =
+        true;
+
+
+    house.add(
+        body
+    );
 
 
     const roof =
@@ -528,19 +598,30 @@ function createHouse(x, z) {
             ),
 
             new THREE.MeshStandardMaterial({
-                color: 0xaa3333
+
+                color:
+                    0xaa3333
+
             })
 
         );
 
-    roof.position.y = 8;
+
+    roof.position.y =
+        8;
+
 
     roof.rotation.y =
         Math.PI / 4;
 
-    roof.castShadow = true;
 
-    house.add(roof);
+    roof.castShadow =
+        true;
+
+
+    house.add(
+        roof
+    );
 
 
     const door =
@@ -553,10 +634,14 @@ function createHouse(x, z) {
             ),
 
             new THREE.MeshStandardMaterial({
-                color: 0x553322
+
+                color:
+                    0x553322
+
             })
 
         );
+
 
     door.position.set(
         0,
@@ -564,7 +649,10 @@ function createHouse(x, z) {
         5.1
     );
 
-    house.add(door);
+
+    house.add(
+        door
+    );
 
 
     house.position.set(
@@ -573,7 +661,10 @@ function createHouse(x, z) {
         z
     );
 
-    scene.add(house);
+
+    scene.add(
+        house
+    );
 }
 
 
@@ -586,11 +677,14 @@ createHouse(-35, 70);
 createHouse(35, 120);
 
 
-/* =====================================================
+/* =========================================================
    BÄUME
-===================================================== */
+========================================================= */
 
-function createTree(x, z) {
+function createTree(
+    x,
+    z
+) {
 
     const tree =
         new THREE.Group();
@@ -607,14 +701,22 @@ function createTree(x, z) {
             ),
 
             new THREE.MeshStandardMaterial({
-                color: 0x6b3f20
+
+                color:
+                    0x6b3f20
+
             })
 
         );
 
-    trunk.position.y = 2;
 
-    tree.add(trunk);
+    trunk.position.y =
+        2;
+
+
+    tree.add(
+        trunk
+    );
 
 
     const leaves =
@@ -627,14 +729,22 @@ function createTree(x, z) {
             ),
 
             new THREE.MeshStandardMaterial({
-                color: 0x228b22
+
+                color:
+                    0x228b22
+
             })
 
         );
 
-    leaves.position.y = 5;
 
-    tree.add(leaves);
+    leaves.position.y =
+        5;
+
+
+    tree.add(
+        leaves
+    );
 
 
     tree.position.set(
@@ -643,11 +753,14 @@ function createTree(x, z) {
         z
     );
 
-    scene.add(tree);
+
+    scene.add(
+        tree
+    );
 }
 
 
-const trees = [
+const treePositions = [
 
     [-15, -20],
     [15, -40],
@@ -667,20 +780,21 @@ const trees = [
 
 
 for (
-    const tree of trees
+    const position
+    of treePositions
 ) {
 
     createTree(
-        tree[0],
-        tree[1]
+        position[0],
+        position[1]
     );
 
 }
 
 
-/* =====================================================
-   SPIELER
-===================================================== */
+/* =========================================================
+   EIGENER SPIELER
+========================================================= */
 
 const player =
     new THREE.Mesh(
@@ -693,10 +807,14 @@ const player =
         ),
 
         new THREE.MeshStandardMaterial({
-            color: 0x3366ff
+
+            color:
+                0x3366ff
+
         })
 
     );
+
 
 player.position.set(
     0,
@@ -704,14 +822,19 @@ player.position.set(
     10
 );
 
-player.castShadow = true;
 
-scene.add(player);
+player.castShadow =
+    true;
 
 
-/* =====================================================
-   VARIABLEN
-===================================================== */
+scene.add(
+    player
+);
+
+
+/* =========================================================
+   SPIELER-VARIABLEN
+========================================================= */
 
 let uid = null;
 
@@ -729,28 +852,39 @@ let pitch = 0;
 
 const keys = {};
 
+
+/*
+    Hier werden die anderen Spieler gespeichert.
+
+    NICHT in Firebase!
+    Nur lokal im Browser.
+*/
+
 const otherPlayers = {};
 
 
-/* =====================================================
+/* =========================================================
    TASTEN
-===================================================== */
+========================================================= */
 
 window.addEventListener(
     "keydown",
-    e => {
+    event => {
 
-        keys[e.code] = true;
+        keys[event.code] =
+            true;
 
 
         if (
-            e.code === "Space" &&
+            event.code === "Space" &&
             grounded
         ) {
 
-            velocityY = 8;
+            velocityY =
+                8;
 
-            grounded = false;
+            grounded =
+                false;
 
         }
 
@@ -760,39 +894,42 @@ window.addEventListener(
 
 window.addEventListener(
     "keyup",
-    e => {
+    event => {
 
-        keys[e.code] = false;
+        keys[event.code] =
+            false;
 
     }
 );
 
 
-/* =====================================================
+/* =========================================================
    MAUS
-===================================================== */
+========================================================= */
 
 document.addEventListener(
     "mousemove",
-    e => {
+    event => {
 
-        if (
-            !started
-        ) return;
+        if (!started)
+            return;
 
 
         if (
             document.pointerLockElement !==
             renderer.domElement
-        ) return;
+        )
+            return;
 
 
         yaw -=
-            e.movementX * 0.002;
+            event.movementX *
+            0.002;
 
 
         pitch -=
-            e.movementY * 0.002;
+            event.movementY *
+            0.002;
 
 
         pitch =
@@ -822,9 +959,9 @@ renderer.domElement.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
    FIREBASE LOGIN
-===================================================== */
+========================================================= */
 
 async function login() {
 
@@ -834,17 +971,20 @@ async function login() {
 
     try {
 
-        await signInAnonymously(auth);
+        await signInAnonymously(
+            auth
+        );
 
     } catch (error) {
 
         console.error(
-            "LOGIN FEHLER:",
             error
         );
 
+
         statusText.textContent =
-            "LOGIN FEHLER";
+            "Login Fehler";
+
 
         alert(
             "Firebase Login Fehler:\n\n" +
@@ -856,18 +996,27 @@ async function login() {
 }
 
 
+/* =========================================================
+   AUTH
+========================================================= */
+
 onAuthStateChanged(
     auth,
     async user => {
 
-        if (!user) return;
+        if (!user)
+            return;
 
-        uid = user.uid;
+
+        uid =
+            user.uid;
+
 
         console.log(
             "MEINE UID:",
             uid
         );
+
 
         await connectPlayer();
 
@@ -875,58 +1024,59 @@ onAuthStateChanged(
 );
 
 
-/* =====================================================
+/* =========================================================
    SPIELER VERBINDEN
-===================================================== */
+========================================================= */
 
 async function connectPlayer() {
 
-    console.log(
-        "LOBBY:",
-        LOBBY_ID
-    );
+    /*
+        Exakter Pfad des eigenen Spielers
+    */
 
-    console.log(
-        "PLAYER PATH:",
-        "games/main/lobbies/" +
-        LOBBY_ID +
-        "/players/" +
-        uid
-    );
-
-
-    const myRef =
+    const myPlayerRef =
         ref(
             db,
-            "games/main/lobbies/" +
-            LOBBY_ID +
-            "/players/" +
+            playersPath +
+            "/" +
             uid
         );
 
 
+    console.log(
+        "Lobby:",
+        LOBBY_ID
+    );
+
+
+    console.log(
+        "Player:",
+        uid
+    );
+
+
     /*
-        Bei Disconnect automatisch löschen
+        Bei Disconnect löschen
     */
 
-    await onDisconnect(
-        myRef
+    onDisconnect(
+        myPlayerRef
     ).remove();
 
 
     /*
-        EIN MONSTER für die ganze Lobby
+        Monster auswählen.
+
+        Nur der allererste Spieler
+        bekommt die Monster-Rolle.
     */
 
     const transaction =
         await runTransaction(
-            monsterRef,
-            currentMonster => {
 
-                /*
-                    Noch kein Monster:
-                    Dieser Spieler wird Monster.
-                */
+            monsterRef,
+
+            currentMonster => {
 
                 if (
                     currentMonster === null
@@ -936,14 +1086,10 @@ async function connectPlayer() {
 
                 }
 
-
-                /*
-                    Monster existiert bereits.
-                */
-
                 return currentMonster;
 
             }
+
         );
 
 
@@ -955,24 +1101,15 @@ async function connectPlayer() {
         monsterId === uid
     ) {
 
-        myRole = "monster";
+        myRole =
+            "monster";
 
     } else {
 
-        myRole = "player";
+        myRole =
+            "player";
 
     }
-
-
-    console.log(
-        "MONSTER UID:",
-        monsterId
-    );
-
-    console.log(
-        "MEINE ROLLE:",
-        myRole
-    );
 
 
     roleText.textContent =
@@ -982,11 +1119,11 @@ async function connectPlayer() {
 
 
     /*
-        Spieler in die Lobby schreiben
+        Eigene Daten speichern
     */
 
     await set(
-        myRef,
+        myPlayerRef,
         {
 
             x:
@@ -1012,22 +1149,27 @@ async function connectPlayer() {
 
 
     statusText.textContent =
-        "Mit Lobby verbunden";
+        "Verbunden";
 
 
     /*
-        ALLE SPIELER DER LOBBY BEOBACHTEN
+        WICHTIG:
+
+        Wir hören auf den gesamten
+        players-Ordner.
     */
 
     onValue(
         playersRef,
+
         snapshot => {
 
             const data =
                 snapshot.val() || {};
 
+
             console.log(
-                "SPIELER IN LOBBY:",
+                "SPIELER:",
                 data
             );
 
@@ -1038,7 +1180,7 @@ async function connectPlayer() {
                 ).length;
 
 
-            playerCount.textContent =
+            playerCountText.textContent =
                 count;
 
 
@@ -1062,51 +1204,67 @@ async function connectPlayer() {
             );
 
         },
+
         error => {
 
             console.error(
-                "DATABASE FEHLER:",
+                "Firebase Fehler:",
                 error
             );
 
+
             statusText.textContent =
-                "DATABASE FEHLER";
+                "Firebase Fehler";
 
         }
     );
 
 
     /*
-        Eigene Position senden
+        Position senden.
+
+        20 Updates pro Sekunde.
     */
 
     setInterval(
         async () => {
 
-            if (!uid) return;
+            if (!uid)
+                return;
 
 
-            await update(
-                myRef,
-                {
+            try {
 
-                    x:
-                        player.position.x,
+                await update(
+                    myPlayerRef,
+                    {
 
-                    y:
-                        player.position.y,
+                        x:
+                            player.position.x,
 
-                    z:
-                        player.position.z,
+                        y:
+                            player.position.y,
 
-                    rotation:
-                        yaw,
+                        z:
+                            player.position.z,
 
-                    role:
-                        myRole
+                        rotation:
+                            yaw,
 
-                }
-            );
+                        role:
+                            myRole
+
+                    }
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Position senden:",
+                    error
+                );
+
+            }
 
         },
         50
@@ -1115,21 +1273,33 @@ async function connectPlayer() {
 }
 
 
-/* =====================================================
-   ANDERE SPIELER ERSTELLEN
-===================================================== */
+/* =========================================================
+   ANDEREN SPIELER ERSTELLEN
+========================================================= */
 
 function createOtherPlayer(
     id,
     data
 ) {
 
+    console.log(
+        "Erstelle anderen Spieler:",
+        id
+    );
+
+
+    const color =
+        data.role === "monster"
+            ? 0xff2222
+            : 0x3366ff;
+
+
     const material =
         new THREE.MeshStandardMaterial({
+
             color:
-                data.role === "monster"
-                    ? 0xff2222
-                    : 0x3366ff
+                color
+
         });
 
 
@@ -1163,10 +1333,13 @@ function createOtherPlayer(
         data.rotation ?? 0;
 
 
-    mesh.castShadow = true;
+    mesh.castShadow =
+        true;
 
 
-    scene.add(mesh);
+    scene.add(
+        mesh
+    );
 
 
     otherPlayers[id] =
@@ -1175,28 +1348,39 @@ function createOtherPlayer(
 }
 
 
-/* =====================================================
+/* =========================================================
    ANDERE SPIELER AKTUALISIEREN
-===================================================== */
+========================================================= */
 
-function updateOtherPlayers(data) {
+function updateOtherPlayers(
+    data
+) {
 
     /*
-        Neue Spieler
+        Spieler erstellen / bewegen
     */
 
     for (
         const id in data
     ) {
 
+        /*
+            Eigenen Spieler überspringen
+        */
+
         if (
             id === uid
-        ) continue;
+        )
+            continue;
 
 
-        const p =
+        const playerData =
             data[id];
 
+
+        /*
+            Noch nicht vorhanden
+        */
 
         if (
             !otherPlayers[id]
@@ -1204,32 +1388,52 @@ function updateOtherPlayers(data) {
 
             createOtherPlayer(
                 id,
-                p
+                playerData
             );
 
-        } else {
+        }
+
+
+        /*
+            Spieler existiert bereits
+        */
+
+        else {
 
             const mesh =
                 otherPlayers[id];
 
 
-            mesh.position.set(
+            /*
+                Wir setzen das Ziel.
 
-                p.x ?? 0,
+                Die eigentliche Bewegung
+                wird unten weich interpoliert.
+            */
 
-                p.y ?? 1.2,
-
-                p.z ?? 0
-
-            );
+            mesh.userData.targetX =
+                playerData.x ?? 0;
 
 
-            mesh.rotation.y =
-                p.rotation ?? 0;
+            mesh.userData.targetY =
+                playerData.y ?? 1.2;
 
+
+            mesh.userData.targetZ =
+                playerData.z ?? 0;
+
+
+            mesh.userData.targetRotation =
+                playerData.rotation ?? 0;
+
+
+            /*
+                Rolle / Farbe
+            */
 
             if (
-                p.role === "monster"
+                playerData.role ===
+                "monster"
             ) {
 
                 mesh.material.color.set(
@@ -1265,6 +1469,7 @@ function updateOtherPlayers(data) {
                 otherPlayers[id]
             );
 
+
             delete otherPlayers[id];
 
         }
@@ -1274,13 +1479,87 @@ function updateOtherPlayers(data) {
 }
 
 
-/* =====================================================
+/* =========================================================
+   SYNCHRONISIERTE BEWEGUNG
+========================================================= */
+
+function smoothOtherPlayers() {
+
+    for (
+        const id in otherPlayers
+    ) {
+
+        const mesh =
+            otherPlayers[id];
+
+
+        /*
+            Falls der Spieler gerade
+            erst erstellt wurde
+        */
+
+        if (
+            mesh.userData.targetX === undefined
+        ) {
+
+            continue;
+
+        }
+
+
+        /*
+            Weiche Bewegung.
+
+            Dadurch sieht die andere Figur
+            nicht ruckelig aus.
+        */
+
+        mesh.position.x +=
+            (
+                mesh.userData.targetX -
+                mesh.position.x
+            ) * 0.35;
+
+
+        mesh.position.y +=
+            (
+                mesh.userData.targetY -
+                mesh.position.y
+            ) * 0.35;
+
+
+        mesh.position.z +=
+            (
+                mesh.userData.targetZ -
+                mesh.position.z
+            ) * 0.35;
+
+
+        /*
+            Rotation
+        */
+
+        mesh.rotation.y +=
+            (
+                mesh.userData.targetRotation -
+                mesh.rotation.y
+            ) * 0.35;
+
+    }
+
+}
+
+
+/* =========================================================
    BEWEGUNG
-===================================================== */
+========================================================= */
 
-function movement(delta) {
+function movement(
+    delta
+) {
 
-    if (!started) return;
+    if (!started)
+        return;
 
 
     let speed = 7;
@@ -1357,12 +1636,15 @@ function movement(delta) {
 
 
         direction.applyAxisAngle(
+
             new THREE.Vector3(
                 0,
                 1,
                 0
             ),
+
             yaw
+
         );
 
 
@@ -1396,17 +1678,20 @@ function movement(delta) {
         player.position.y <= 1.2
     ) {
 
-        player.position.y = 1.2;
+        player.position.y =
+            1.2;
 
-        velocityY = 0;
+        velocityY =
+            0;
 
-        grounded = true;
+        grounded =
+            true;
 
     }
 
 
     /*
-        Map Grenze
+        Map-Grenzen
     */
 
     player.position.x =
@@ -1427,9 +1712,9 @@ function movement(delta) {
 }
 
 
-/* =====================================================
+/* =========================================================
    KAMERA
-===================================================== */
+========================================================= */
 
 function updateCamera() {
 
@@ -1454,12 +1739,16 @@ function updateCamera() {
 
 
     offset.applyEuler(
+
         new THREE.Euler(
+
             pitch,
             yaw,
             0,
             "YXZ"
+
         )
+
     );
 
 
@@ -1480,15 +1769,17 @@ function updateCamera() {
 }
 
 
-/* =====================================================
-   START
-===================================================== */
+/* =========================================================
+   START BUTTON
+========================================================= */
 
 startButton.addEventListener(
     "click",
     () => {
 
-        started = true;
+        started =
+            true;
+
 
         startScreen.style.display =
             "none";
@@ -1500,9 +1791,9 @@ startButton.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
    GAME LOOP
-===================================================== */
+========================================================= */
 
 let lastTime =
     performance.now();
@@ -1521,8 +1812,12 @@ function animate() {
 
     const delta =
         Math.min(
-            (now - lastTime) / 1000,
+
+            (now - lastTime) /
+            1000,
+
             0.05
+
         );
 
 
@@ -1530,7 +1825,13 @@ function animate() {
         now;
 
 
-    movement(delta);
+    movement(
+        delta
+    );
+
+
+    smoothOtherPlayers();
+
 
     updateCamera();
 
@@ -1546,9 +1847,9 @@ function animate() {
 animate();
 
 
-/* =====================================================
+/* =========================================================
    RESIZE
-===================================================== */
+========================================================= */
 
 window.addEventListener(
     "resize",
@@ -1563,17 +1864,20 @@ window.addEventListener(
 
 
         renderer.setSize(
+
             window.innerWidth,
+
             window.innerHeight
+
         );
 
     }
 );
 
 
-/* =====================================================
-   FIREBASE START
-===================================================== */
+/* =========================================================
+   START FIREBASE
+========================================================= */
 
 login();
 
